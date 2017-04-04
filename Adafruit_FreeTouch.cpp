@@ -28,7 +28,20 @@
 
 
 
-uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(int p) {
+Adafruit_FreeTouch::Adafruit_FreeTouch(int p, filter_level_t f, rsel_val_t r, freq_mode_sel_t fh) {
+  pin = p;
+  oversample = f;
+  seriesres = r;
+  freqhop = fh;
+}
+
+bool Adafruit_FreeTouch::begin(void) {
+
+
+
+}
+
+uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
   runInStandby(true);    //  enable_run_in_stdby();
   enablePTC(true);       //   enable_ptc();
   // check if in progress
@@ -38,15 +51,24 @@ uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(int p) {
   clearEOCintFlag();
   // enable_eoc_int(); // not using irq for now
 
-  // set up sense resistor
-  // set up prescalar
-  // set up freq hopping
+  // set up pin!
+  snapshotRegsAndPrint(PTC_REG_YSELECT_L, 8);
 
-  return startPtcAcquire(p);
+  // set up sense resistor
+  snapshotRegsAndPrint(PTC_REG_SERIESRES, 1);
+  setSeriesResistor(seriesres);
+  // set up prescalar
+  snapshotRegsAndPrint(PTC_REG_CONVCONTROL, 1);
+  setFilterLevel(oversample);
+  // set up freq hopping
+  snapshotRegsAndPrint(PTC_REG_FREQCONTROL, 1);
+  setFreqHopping(freqhop, hops);
+
+  return startPtcAcquire();
 }
 
-uint16_t Adafruit_FreeTouch::startPtcAcquire(int p) {
-  ptcConfigIOpin(p);
+uint16_t Adafruit_FreeTouch::startPtcAcquire(void) {
+  ptcConfigIOpin();
 
   ptcAcquire();
 
@@ -75,20 +97,46 @@ uint16_t Adafruit_FreeTouch::startPtcAcquire(int p) {
 
 /*********************************** low level config **/
 void Adafruit_FreeTouch::setFilterLevel(filter_level_t lvl) {
+  oversample = lvl; // back it up for later
+
   sync_config();
-  QTOUCH_PTC->CONVCONTROL.reg = lvl;
+  QTOUCH_PTC->CONVCONTROL.bit.ADCACCUM = lvl;
+  sync_config();
+}
+
+void Adafruit_FreeTouch::setSeriesResistor(rsel_val_t res) {
+  seriesres = res;
+
+  sync_config();
+  QTOUCH_PTC->SERRES.bit.RESISTOR = res;
+  sync_config();
+}
+
+void Adafruit_FreeTouch::setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hs) {
+  freqhop = fh;
+  hops = hs;
+
+  sync_config();
+  if (fh == FREQ_MODE_NONE) {
+    QTOUCH_PTC->FREQCONTROL.bit.FREQSPREADEN = 0;
+    QTOUCH_PTC->FREQCONTROL.bit.SAMPLEDELAY = 0;
+  } else {
+    QTOUCH_PTC->FREQCONTROL.bit.FREQSPREADEN = 1;
+    QTOUCH_PTC->FREQCONTROL.bit.SAMPLEDELAY = hops;
+  }
   sync_config();
 }
 
 
-void Adafruit_FreeTouch::ptcConfigIOpin(int ulPin) {
-  uint32_t pin = g_APinDescription[ulPin].ulPin;
-  uint32_t port = g_APinDescription[ulPin].ulPort;
-  
-  PORT->Group[port].PINCFG[pin].reg = 0x3;  // pmuxen + input
 
-  uint8_t pmux = PORT->Group[port].PMUX[(pin - (port*32))/2].reg;
-  if (pin & 1) {
+void Adafruit_FreeTouch::ptcConfigIOpin(void) {
+  uint32_t ulpin = g_APinDescription[pin].ulPin;
+  uint32_t ulport = g_APinDescription[pin].ulPort;
+  
+  PORT->Group[ulport].PINCFG[ulpin].reg = 0x3;  // pmuxen + input
+
+  uint8_t pmux = PORT->Group[ulport].PMUX[(ulpin - (ulport*32))/2].reg;
+  if (ulpin & 1) {
     // pmuxodd
     pmux &= 0x0F; // keep the even mux data
     pmux |= 0x10; // set to mux B
@@ -97,7 +145,7 @@ void Adafruit_FreeTouch::ptcConfigIOpin(int ulPin) {
     pmux &= 0xF0;  // keep the odd mux data
     pmux |= 0x01;  // set to mux B
   }
-  PORT->Group[port].PMUX[(pin - (port*32))/2].reg = pmux;
+  PORT->Group[ulport].PMUX[(ulpin - (ulport*32))/2].reg = pmux;
 }
 
 
@@ -235,9 +283,9 @@ void Adafruit_FreeTouch::printPTCregs(uint32_t base, uint8_t *regs, uint8_t num)
           Serial.print(" Conv Cntl:\t\t0x"); printHex(regs[i], true); break; 
         case 0x42004C10: Serial.print("0x"); Serial.print(i+base, HEX);
           Serial.print(" Y Select1:\t\t0x"); printHex(regs[i], true); break; 
-/*
         case 0x42004C11: Serial.print("0x"); Serial.print(i+0x42004C00, HEX);
           Serial.print(" Y Select2:\t\t0x"); printHex(regs[i], true); break; 
+/*
         case 0x42004C12: Serial.print("0x"); Serial.print(i+0x42004C00, HEX);
           Serial.print(" X Select1:\t\t0x"); printHex(regs[i], true); break; 
         case 0x42004C13: Serial.print("0x"); Serial.print(i+0x42004C00, HEX);
@@ -245,9 +293,9 @@ void Adafruit_FreeTouch::printPTCregs(uint32_t base, uint8_t *regs, uint8_t num)
 */
         case 0x42004C14: Serial.print("0x"); Serial.print(i+base, HEX);
           Serial.print(" Y Enable1:\t\t0x"); printHex(regs[i], true); break; 
-/*
         case 0x42004C15: Serial.print("0x"); Serial.print(i+0x42004C00, HEX);
           Serial.print(" Y Enable2:\t\t0x"); printHex(regs[i], true); break; 
+/*
         case 0x42004C16: Serial.print("0x"); Serial.print(i+0x42004C00, HEX);
           Serial.print(" X Enable1:\t\t0x"); printHex(regs[i], true); break; 
         case 0x42004C17: Serial.print("0x"); Serial.print(i+0x42004C00, HEX);

@@ -208,7 +208,7 @@
  * When frequency mode none option is selected, the PTC runs at
  * constant speed.  This mode is suited for best power consumption.
  */
-#define DEF_SELFCAP_FREQ_MODE   FREQ_MODE_NONE
+#define DEF_SELFCAP_FREQ_MODE   FREQ_MODE_SPREAD
 
 /**
  * PTC acquisition frequency delay setting.
@@ -229,7 +229,7 @@
  * as the acquisition frequency.
  * Range: FREQ_HOP_SEL_1 to FREQ_HOP_SEL_16
  */
-#define DEF_SELFCAP_HOP_FREQS  FREQ_HOP_SEL_1,FREQ_HOP_SEL_2,FREQ_HOP_SEL_3
+#define DEF_SELFCAP_HOP_FREQS  FREQ_HOP_SEL_1,FREQ_HOP_SEL_1
 
 /**
  * Self cap PTC clock pre-scalar.
@@ -254,32 +254,7 @@
  * RSEL_VAL_50  sets internal series resistor to 50Kohms.
  * RSEL_VAL_100 sets internal series resistor to 100Kohms.
  */
-#define DEF_SELFCAP_SENSE_RESISTOR_PER_NODE RSEL_VAL_0 , RSEL_VAL_0
-
-/**
- * Self cap PTC clock pre-scalar.
- * PTC clock prescale setting.   Refer touch_configure_ptc_clock() API in
- *touch.c
- * Example: if Generic clock input to PTC = 4MHz, then:
- * PRSC_DIV_SEL_1   sets PTC Clock to  4MHz
- * PRSC_DIV_SEL_2   sets PTC Clock to  2MHz
- * PRSC_DIV_SEL_4   sets PTC Clock to 1MHz
- * PRSC_DIV_SEL_8   sets PTC Clock to 500KHz
- */
-#define DEF_SELFCAP_CLK_PRESCALE_PER_NODE PRSC_DIV_SEL_1,PRSC_DIV_SEL_1
-
-/**
- * PTC series resistor setting.  For Mutual cap mode, this series
- * resistor is switched internally on the Y-pin.  For Self cap mode,
- * the series resistor is switched internally on the Sensor pin.
- *
- * Example:
- * RSEL_VAL_0   sets internal series resistor to 0ohms.
- * RSEL_VAL_20  sets internal series resistor to 20Kohms.
- * RSEL_VAL_50  sets internal series resistor to 50Kohms.
- * RSEL_VAL_100 sets internal series resistor to 100Kohms.
- */
-#define DEF_SELFCAP_SENSE_RESISTOR_PER_NODE RSEL_VAL_0,RSEL_VAL_0
+#define DEF_SELFCAP_SENSE_RESISTOR_PER_NODE RSEL_VAL_100,RSEL_VAL_100
 
 /**
 	This is the default auto tune mode selection.

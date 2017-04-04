@@ -110,14 +110,125 @@ typedef union {
 #define PTC_REG_ADCACC_MASK 0x07
 
 
+/*************** Y SELECT L+H reg ***************/
+
+typedef union {
+  struct {
+    uint8_t   Y0:1;
+    uint8_t   Y1:1;
+    uint8_t   Y2:1;
+    uint8_t   Y3:1;
+    uint8_t   Y4:1;
+    uint8_t   Y5:1;
+    uint8_t   Y6:1;
+    uint8_t   Y7:1;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_YSELECTL_Type;
+
+typedef union {
+  struct {
+    uint8_t   Y8:1;
+    uint8_t   Y9:1;
+    uint8_t   Y10:1;
+    uint8_t   Y11:1;
+    uint8_t   Y12:1;
+    uint8_t   Y13:1;
+    uint8_t   Y14:1;
+    uint8_t   Y15:1;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_YSELECTH_Type;
+
+#define PTC_REG_YSELECT_L 0x42004C10
+#define PTC_REG_YSELECT_H 0x42004C11
+
+#define PTC_REG_YENABLE_L 0x42004C14
+#define PTC_REG_YENABLE_H 0x42004C15
+
+
+/*************** X SELECT L+H reg ***************/
+
+typedef union {
+  struct {
+    uint8_t   X0:1;
+    uint8_t   X1:1;
+    uint8_t   X2:1;
+    uint8_t   X3:1;
+    uint8_t   X4:1;
+    uint8_t   X5:1;
+    uint8_t   X6:1;
+    uint8_t   X7:1;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_XSELECTL_Type;
+
+typedef union {
+  struct {
+    uint8_t   X8:1;
+    uint8_t   X9:1;
+    uint8_t   X10:1;
+    uint8_t   X11:1;
+    uint8_t   X12:1;
+    uint8_t   X13:1;
+    uint8_t   X14:1;
+    uint8_t   X15:1;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_XSELECTH_Type;
+
+
+#define PTC_REG_XSELECT_L 0x42004C12
+#define PTC_REG_XSELECT_H 0x42004C13
+
+#define PTC_REG_XENABLE_L 0x42004C16
+#define PTC_REG_XENABLE_H 0x42004C17
+
+/*************** Compensation Cap reg ***************/
+
+typedef union {
+  struct {
+    uint8_t   value:8;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_COMPCAPL_Type;
+
+typedef union {
+  struct {
+    uint8_t   value:6;
+    uint8_t   __pad0__:2;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_COMPCAPH_Type;
+
+
+/*************** Int Cap reg ***************/
+
+typedef union {
+  struct {
+    uint8_t   value:6;
+    uint8_t   __pad0__:2;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_INTCAP_Type;
+
+/*************** Series resistor reg ***************/
+
+typedef union {
+  struct {
+    uint8_t   RESISTOR:2;
+    uint8_t   __pad0__:6;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_SERRES_Type;
+
+#define PTC_REG_SERIESRES    0x42004C1B
+
+
 
 #define PTC_REG_CONVRESULT_L 0x42004C1C
 #define PTC_REG_CONVRESULT_H 0x42004C1D
 
-#define PTC_REG_XYSELECT_A_L 0x42004C10
-#define PTC_REG_XYSELECT_A_H 0x42004C11
-#define PTC_REG_XYSELECT_B_L 0x42004C12
-#define PTC_REG_XYSELECT_B_H 0x42004C13
 
 #define PTC_REG_XYENABLE     0x42004C16
 #define PTC_BIT_XYENABLE     0x02
@@ -151,6 +262,22 @@ typedef struct {
   uint8_t   __padb__;                // 0x42004C0B unknown
   __IO PTC_REG_FREQCONTROL_Type FREQCONTROL;  //0x42004C0C
   __IO PTC_REG_CONVCONTROL_Type CONVCONTROL;  // 0x42004C0D
+  uint8_t   __pade__;                // 0x42004C0E unknown
+  uint8_t   __padf__;                // 0x42004C0F unknown
+  __IO PTC_REG_YSELECTL_Type YSELECTL;  // 0x42004C10
+  __IO PTC_REG_YSELECTL_Type YSELECTH;  // 0x42004C11
+  __IO PTC_REG_XSELECTL_Type XSELECTL;  // 0x42004C12
+  __IO PTC_REG_XSELECTL_Type XSELECTH;  // 0x42004C13
+  __IO PTC_REG_YSELECTL_Type YENABLEL;  // 0x42004C14
+  __IO PTC_REG_YSELECTL_Type YENABLEH;  // 0x42004C15
+  __IO PTC_REG_XSELECTL_Type XENABLEL;  // 0x42004C16
+  __IO PTC_REG_XSELECTL_Type XENABLEH;  // 0x42004C17
+
+  __IO PTC_REG_COMPCAPL_Type COMPCAPL;  // 0x42004C18
+  __IO PTC_REG_COMPCAPH_Type COMPCAPH;  // 0x42004C19
+  __IO PTC_REG_INTCAP_Type   INTCAP;    // 0x42004C1A
+  __IO PTC_REG_SERRES_Type   SERRES;    // 0x42004C1B
+
 } Qtouch_Ptc;
 
 #define QTOUCH_PTC  (( Qtouch_Ptc *)0x42004C00U)
@@ -167,10 +294,12 @@ typedef struct {
 
 class Adafruit_FreeTouch {
  public:
+  Adafruit_FreeTouch(int p, filter_level_t f = FILTER_LEVEL_4, rsel_val_t r = RSEL_VAL_0, freq_mode_sel_t fh = FREQ_MODE_NONE);
+  bool begin(void);
 
-  void ptcConfigIOpin(int ulPin);
-  uint16_t startPtcAcquire(int p);
-  uint16_t touchSelfcapSensorsMeasure(int p);
+  void ptcConfigIOpin(void);
+  uint16_t startPtcAcquire(void);
+  uint16_t touchSelfcapSensorsMeasure(void);
 
   // debugging helper!
   void snapshotRegsAndPrint(uint32_t base, uint8_t numregs);
@@ -178,6 +307,8 @@ class Adafruit_FreeTouch {
   void printHex(uint8_t h, boolean newline);
 
   void setFilterLevel(filter_level_t lvl);
+  void setSeriesResistor(rsel_val_t res);
+  void setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hops = FREQ_HOP_SEL_1);
 
   void runInStandby(boolean en);
   void enablePTC(boolean en);
@@ -186,6 +317,14 @@ class Adafruit_FreeTouch {
   void clearEOCintFlag(void);
   void ptcAcquire(void);
   void sync_config(void);
+
+ private:
+  int pin;           // arduino pin #
+  int8_t yline;      // the Y select line (see datasheet)
+  filter_level_t oversample;
+  rsel_val_t seriesres;
+  freq_mode_sel_t freqhop;
+  freq_hop_sel_t hops;
 };
 
 
