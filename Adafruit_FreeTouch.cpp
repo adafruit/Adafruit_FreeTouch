@@ -33,15 +33,23 @@ Adafruit_FreeTouch::Adafruit_FreeTouch(int p, filter_level_t f, rsel_val_t r, fr
   oversample = f;
   seriesres = r;
   freqhop = fh;
+  yline = -1;
 }
 
 bool Adafruit_FreeTouch::begin(void) {
+  yline = getYLine();
+
+  if (yline == -1) 
+    return false;
 
 
-
+  return true;
 }
 
 uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
+  if (yline == -1) 
+    return -1;
+
   runInStandby(true);    //  enable_run_in_stdby();
   enablePTC(true);       //   enable_ptc();
   // check if in progress
@@ -52,8 +60,9 @@ uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
   // enable_eoc_int(); // not using irq for now
 
   // set up pin!
+  Serial.print("Y Line #"); Serial.println(yline);
+  selectYLine();
   snapshotRegsAndPrint(PTC_REG_YSELECT_L, 8);
-
   // set up sense resistor
   snapshotRegsAndPrint(PTC_REG_SERIESRES, 1);
   setSeriesResistor(seriesres);
@@ -96,6 +105,46 @@ uint16_t Adafruit_FreeTouch::startPtcAcquire(void) {
 }
 
 /*********************************** low level config **/
+
+void Adafruit_FreeTouch::selectYLine(void) {
+
+  sync_config();
+  if (yline < 8) {
+    QTOUCH_PTC->YSELECTL.reg = 1 << yline;
+  } else {
+    QTOUCH_PTC->YSELECTL.reg = 0;
+  }
+
+  if (yline > 7) {
+    QTOUCH_PTC->YSELECTH.reg = 1 << (yline - 8);
+  } else {
+    QTOUCH_PTC->YSELECTH.reg = 0;
+  }
+  
+  sync_config();
+}
+
+int Adafruit_FreeTouch::getYLine(void) {
+  int p = g_APinDescription[pin].ulPin;
+  if (g_APinDescription[pin].ulPort == PORTA) {
+    if ((p >= 2) && (p <= 7)) {
+      Serial.println("A");
+      Serial.println(p);
+      return (p - 2);
+    }
+  }
+  if (g_APinDescription[pin].ulPort == PORTB) {
+    if ((p >= 0) && (p <= 9)) {
+      Serial.println("B");
+      return (p + 6);
+    }
+  }
+
+  // not valid
+  return -1;
+
+}
+
 void Adafruit_FreeTouch::setFilterLevel(filter_level_t lvl) {
   oversample = lvl; // back it up for later
 

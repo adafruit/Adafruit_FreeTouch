@@ -306,6 +306,9 @@ class Adafruit_FreeTouch {
   void printPTCregs(uint32_t base, uint8_t *regs, uint8_t num);
   void printHex(uint8_t h, boolean newline);
 
+
+  int  getYLine(void);
+  void selectYLine(void);
   void setFilterLevel(filter_level_t lvl);
   void setSeriesResistor(rsel_val_t res);
   void setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hops = FREQ_HOP_SEL_1);
@@ -326,8 +329,5 @@ class Adafruit_FreeTouch {
   freq_mode_sel_t freqhop;
   freq_hop_sel_t hops;
 };
-
-
-
 
 #endif
