@@ -28,8 +28,6 @@
 
 
 
-
-
 uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(int p) {
   runInStandby(true);    //  enable_run_in_stdby();
   enablePTC(true);       //   enable_ptc();
@@ -58,12 +56,15 @@ uint16_t Adafruit_FreeTouch::startPtcAcquire(int p) {
   //Serial.println("\n\n");
 
   digitalWrite(12, HIGH);
+  int counter = 0;
   while (QTOUCH_PTC->CONVCONTROL.bit.CONVERT) {
-    Serial.print(".");
+    delay(1);
+    counter++;
   }
   digitalWrite(12, LOW);
 
-  Serial.println("Conversion ended! Got: ");
+  Serial.print("Conversion ended in ");
+  Serial.print(counter); Serial.print(" ms. Got: ");
   uint16_t result = *(uint8_t *)(PTC_REG_CONVRESULT_H);
   result <<= 8;
   result |= *(uint8_t *)(PTC_REG_CONVRESULT_L);
@@ -71,6 +72,14 @@ uint16_t Adafruit_FreeTouch::startPtcAcquire(int p) {
 
   return result;
 }
+
+/*********************************** low level config **/
+void Adafruit_FreeTouch::setFilterLevel(filter_level_t lvl) {
+  sync_config();
+  QTOUCH_PTC->CONVCONTROL.reg = lvl;
+  sync_config();
+}
+
 
 void Adafruit_FreeTouch::ptcConfigIOpin(int ulPin) {
   uint32_t pin = g_APinDescription[ulPin].ulPin;

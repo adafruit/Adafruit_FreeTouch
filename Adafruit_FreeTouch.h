@@ -177,6 +177,7 @@ class Adafruit_FreeTouch {
   void printPTCregs(uint32_t base, uint8_t *regs, uint8_t num);
   void printHex(uint8_t h, boolean newline);
 
+  void setFilterLevel(filter_level_t lvl);
 
   void runInStandby(boolean en);
   void enablePTC(boolean en);
