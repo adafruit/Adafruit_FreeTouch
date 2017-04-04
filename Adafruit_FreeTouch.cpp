@@ -37,10 +37,19 @@ Adafruit_FreeTouch::Adafruit_FreeTouch(int p, filter_level_t f, rsel_val_t r, fr
 }
 
 bool Adafruit_FreeTouch::begin(void) {
-  yline = getYLine();
+  yline = getYLine();  // determine the Y0-15 #
 
-  if (yline == -1) 
+  if (yline == -1)     // not all pins have Y line
     return false;
+
+  // enable the sensor, only done once per line
+  sync_config();
+  if (yline < 8) {
+    QTOUCH_PTC->YENABLEL.reg |= 1 << yline;
+  } else if (yline < 16) {
+    QTOUCH_PTC->YENABLEH.reg = 1 << (yline - 8);
+  }  
+  sync_config();
 
 
   return true;
@@ -50,10 +59,10 @@ uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
   if (yline == -1) 
     return -1;
 
-  runInStandby(true);    //  enable_run_in_stdby();
-  enablePTC(true);       //   enable_ptc();
+  runInStandby(true);
+  enablePTC(true);
   // check if in progress
-  // set up NVIC
+  // set up NVIC if using INT (we're not)
   enableWCOint(false);
   clearWCOintFlag();
   clearEOCintFlag();
