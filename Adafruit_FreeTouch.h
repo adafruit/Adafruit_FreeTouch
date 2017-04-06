@@ -41,6 +41,15 @@ typedef union {
   uint8_t reg;
 } PTC_REG_CONTROLB_Type;
 
+/*************** UNK4C04 register ***************/
+
+#define PTC_REG_UNK4C04 0x42004C04
+
+typedef union {
+  uint8_t reg;
+} PTC_REG_UNK4C04_Type;
+
+
 /*************** CONTROL C register ***************/
 
 #define PTC_REG_CONTROLC 0x42004C05
@@ -188,29 +197,34 @@ typedef union {
 
 typedef union {
   struct {
-    uint8_t   value:8;
+    uint8_t   VALUE:8;
   } bit;
   uint8_t reg;
 } __attribute__ ((packed)) PTC_REG_COMPCAPL_Type;
 
 typedef union {
   struct {
-    uint8_t   value:6;
+    uint8_t   VALUE:6;
     uint8_t   __pad0__:2;
   } bit;
   uint8_t reg;
 } __attribute__ ((packed)) PTC_REG_COMPCAPH_Type;
 
+#define PTC_REG_COMPCAPL    0x42004C18
+#define PTC_REG_COMPCAPH    0x42004C19
 
 /*************** Int Cap reg ***************/
 
 typedef union {
   struct {
-    uint8_t   value:6;
+    uint8_t   VALUE:6;
     uint8_t   __pad0__:2;
   } bit;
   uint8_t reg;
 } __attribute__ ((packed)) PTC_REG_INTCAP_Type;
+
+
+#define PTC_REG_INTCAP    0x42004C1A
 
 /*************** Series resistor reg ***************/
 
@@ -224,18 +238,40 @@ typedef union {
 
 #define PTC_REG_SERIESRES    0x42004C1B
 
+/*************** conversion result reg ***************/
 
+typedef union {
+  struct {
+    uint8_t   LOWBYTE;
+    uint8_t   HIGHBYTE;
+  } byte;
+  uint16_t reg;
+} __attribute__ ((packed)) PTC_REG_CONVRESULT_Type;
 
 #define PTC_REG_CONVRESULT_L 0x42004C1C
 #define PTC_REG_CONVRESULT_H 0x42004C1D
 
+/*************** burst mode reg ***************/
 
-#define PTC_REG_XYENABLE     0x42004C16
-#define PTC_BIT_XYENABLE     0x02
+typedef union {
+  struct {
+    uint8_t   __pad0__:2;
+    uint8_t   CTSLOWPOWER:1;
+    uint8_t   __pad1__:1;
+    uint8_t   BURSTMODE:4;
+  } bit;
+  uint8_t reg;
+} __attribute__ ((packed)) PTC_REG_BURSTMODE_Type;
+
 
 #define PTC_REG_BURSTMODE     0x42004C20
 #define PTC_REG_BURSTMODE_MASK   0xF0
 #define PTC_BIT_CTSLOWPOWER   0x04
+
+/*************** etc unused reg ***************/
+
+#define PTC_REG_XYENABLE     0x42004C16
+#define PTC_BIT_XYENABLE     0x02
 
 #define PTC_REG_WCO_MODE     0x42004C21
 #define PTC_REG_WCO_MODE_MASK   0x07
@@ -250,20 +286,20 @@ typedef union {
 typedef struct {
   __IO PTC_REG_CONTROLA_Type CONTROLA;    // 0x42004C00
   __IO PTC_REG_CONTROLB_Type CONTROLB;    // 0x42004C01
-  uint8_t   __pad2__;                // 0x42004C02 unknown
-  uint8_t   __pad3__;                // 0x42004C03 unknown
-  uint8_t   __pad4__;                // 0x42004C04 unknown
+  uint8_t   __pad4c02__;                // 0x42004C02 unknown
+  uint8_t   __pad4c03__;                // 0x42004C03 unknown
+  __IO PTC_REG_UNK4C04_Type  UNK4C04;   // 0x42004C04 unknown
   __IO PTC_REG_CONTROLC_Type CONTROLC;    // 0x42004C05
-  uint8_t   __pad6__;                // 0x42004C06 unknown
-  uint8_t   __pad7__;                // 0x42004C07 unknown
+  uint8_t   __pad4c06__;                // 0x42004C06 unknown
+  uint8_t   __pad4c07__;                // 0x42004C07 unknown
   __IO PTC_REG_INT_Type      INTDISABLE;  // 0x42004C08
   __IO PTC_REG_INT_Type      INTENABLE;   // 0x42004C09
   __I  PTC_REG_INT_Type      INTFLAGS;    // 0x42004C0A
-  uint8_t   __padb__;                // 0x42004C0B unknown
+  uint8_t   __pad4c0b__;                // 0x42004C0B unknown
   __IO PTC_REG_FREQCONTROL_Type FREQCONTROL;  //0x42004C0C
   __IO PTC_REG_CONVCONTROL_Type CONVCONTROL;  // 0x42004C0D
-  uint8_t   __pade__;                // 0x42004C0E unknown
-  uint8_t   __padf__;                // 0x42004C0F unknown
+  uint8_t   __pad4c0e__;                // 0x42004C0E unknown
+  uint8_t   __pad4c0f__;                // 0x42004C0F unknown
   __IO PTC_REG_YSELECTL_Type YSELECTL;  // 0x42004C10
   __IO PTC_REG_YSELECTL_Type YSELECTH;  // 0x42004C11
   __IO PTC_REG_XSELECTL_Type XSELECTL;  // 0x42004C12
@@ -278,6 +314,10 @@ typedef struct {
   __IO PTC_REG_INTCAP_Type   INTCAP;    // 0x42004C1A
   __IO PTC_REG_SERRES_Type   SERRES;    // 0x42004C1B
 
+  __IO PTC_REG_CONVRESULT_Type RESULT;  // 0x42004C1C + 0x42004C1D
+  uint8_t   __pad4c1e__;                // 0x42004C1E unknown
+  uint8_t   __pad4c1f__;                // 0x42004C1F unknown
+  __IO PTC_REG_BURSTMODE_Type BURSTMODE; // 0x42004C20
 } Qtouch_Ptc;
 
 #define QTOUCH_PTC  (( Qtouch_Ptc *)0x42004C00U)
@@ -297,6 +337,7 @@ class Adafruit_FreeTouch {
   Adafruit_FreeTouch(int p, filter_level_t f = FILTER_LEVEL_4, rsel_val_t r = RSEL_VAL_0, freq_mode_sel_t fh = FREQ_MODE_NONE);
   bool begin(void);
 
+  void ptcInitSettings(void);
   void ptcConfigIOpin(void);
   uint16_t startPtcAcquire(void);
   uint16_t touchSelfcapSensorsMeasure(void);
@@ -306,16 +347,19 @@ class Adafruit_FreeTouch {
   void printPTCregs(uint32_t base, uint8_t *regs, uint8_t num);
   void printHex(uint8_t h, boolean newline);
 
-
+  void setupClock(void);
   int  getYLine(void);
   void selectYLine(void);
   void setFilterLevel(filter_level_t lvl);
   void setSeriesResistor(rsel_val_t res);
   void setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hops = FREQ_HOP_SEL_1);
+  void setCompCap(uint16_t cc);
+  void setIntCap(uint8_t ic);
 
   void runInStandby(boolean en);
   void enablePTC(boolean en);
   void enableWCOint(boolean en);
+  void enableEOCint(boolean en);
   void clearWCOintFlag(void);
   void clearEOCintFlag(void);
   void ptcAcquire(void);
@@ -328,6 +372,8 @@ class Adafruit_FreeTouch {
   rsel_val_t seriesres;
   freq_mode_sel_t freqhop;
   freq_hop_sel_t hops;
+  uint16_t compcap;
+  uint8_t  intcap;
 };
 
 #endif

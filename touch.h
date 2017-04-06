@@ -208,7 +208,7 @@
  * When frequency mode none option is selected, the PTC runs at
  * constant speed.  This mode is suited for best power consumption.
  */
-#define DEF_SELFCAP_FREQ_MODE   FREQ_MODE_SPREAD
+#define DEF_SELFCAP_FREQ_MODE   FREQ_MODE_NONE
 
 /**
  * PTC acquisition frequency delay setting.
@@ -254,7 +254,7 @@
  * RSEL_VAL_50  sets internal series resistor to 50Kohms.
  * RSEL_VAL_100 sets internal series resistor to 100Kohms.
  */
-#define DEF_SELFCAP_SENSE_RESISTOR_PER_NODE RSEL_VAL_100,RSEL_VAL_100
+#define DEF_SELFCAP_SENSE_RESISTOR_PER_NODE RSEL_VAL_50,RSEL_VAL_50
 
 /**
 	This is the default auto tune mode selection.

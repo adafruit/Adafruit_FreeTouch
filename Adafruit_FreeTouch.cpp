@@ -33,6 +33,8 @@ Adafruit_FreeTouch::Adafruit_FreeTouch(int p, filter_level_t f, rsel_val_t r, fr
   oversample = f;
   seriesres = r;
   freqhop = fh;
+  compcap = 0x2000;
+  intcap = 0x3F;
   yline = -1;
 }
 
@@ -42,18 +44,42 @@ bool Adafruit_FreeTouch::begin(void) {
   if (yline == -1)     // not all pins have Y line
     return false;
 
-  // enable the sensor, only done once per line
-  sync_config();
-  if (yline < 8) {
-    QTOUCH_PTC->YENABLEL.reg |= 1 << yline;
-  } else if (yline < 16) {
-    QTOUCH_PTC->YENABLEH.reg = 1 << (yline - 8);
-  }  
-  sync_config();
+  setupClock();
+  Serial.println("Clock set");
 
+  ptcInitSettings();
+  Serial.println("PTC init");
+
+  enablePTC(false);
+
+  enableWCOint(false);
+  enableEOCint(false);
+
+  // enable the sensor, only done once per line
+  Serial.println("Yline");
+  if (yline < 8) {
+    sync_config();
+    QTOUCH_PTC->YENABLEL.reg |= 1 << yline;
+    sync_config();
+  } else if (yline < 16) {
+    QTOUCH_PTC->YENABLEH.reg |= 1 << (yline - 8);
+  }  
+  Serial.println("Done");
+  enablePTC(true);
 
   return true;
 }
+
+void Adafruit_FreeTouch::setupClock(void) {
+  /* Setup and enable generic clock source for PTC module. */
+    struct system_gclk_chan_config gclk_chan_conf;
+    system_gclk_chan_get_config_defaults(&gclk_chan_conf);
+    gclk_chan_conf.source_generator = GCLK_GENERATOR_1;
+    system_gclk_chan_set_config(PTC_GCLK_ID, &gclk_chan_conf);
+    system_gclk_chan_enable(PTC_GCLK_ID);
+    system_apb_clock_set_mask(SYSTEM_CLOCK_APB_APBC, PM_APBCMASK_PTC);
+}
+
 
 uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
   if (yline == -1) 
@@ -71,16 +97,23 @@ uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
   // set up pin!
   Serial.print("Y Line #"); Serial.println(yline);
   selectYLine();
-  snapshotRegsAndPrint(PTC_REG_YSELECT_L, 8);
+  //snapshotRegsAndPrint(PTC_REG_YSELECT_L, 8);
   // set up sense resistor
-  snapshotRegsAndPrint(PTC_REG_SERIESRES, 1);
+  //snapshotRegsAndPrint(PTC_REG_SERIESRES, 1);
   setSeriesResistor(seriesres);
   // set up prescalar
-  snapshotRegsAndPrint(PTC_REG_CONVCONTROL, 1);
+  //snapshotRegsAndPrint(PTC_REG_CONVCONTROL, 1);
   setFilterLevel(oversample);
   // set up freq hopping
-  snapshotRegsAndPrint(PTC_REG_FREQCONTROL, 1);
+  //snapshotRegsAndPrint(PTC_REG_FREQCONTROL, 1);
   setFreqHopping(freqhop, hops);
+  // set up compensation cap + int (?) cap
+  //snapshotRegsAndPrint(PTC_REG_COMPCAPL, 2);
+  setCompCap(compcap);
+  //snapshotRegsAndPrint(PTC_REG_INTCAP, 1);
+  setIntCap(intcap);
+  sync_config();
+  QTOUCH_PTC->BURSTMODE.reg = 0xA4;
 
   return startPtcAcquire();
 }
@@ -105,9 +138,8 @@ uint16_t Adafruit_FreeTouch::startPtcAcquire(void) {
 
   Serial.print("Conversion ended in ");
   Serial.print(counter); Serial.print(" ms. Got: ");
-  uint16_t result = *(uint8_t *)(PTC_REG_CONVRESULT_H);
-  result <<= 8;
-  result |= *(uint8_t *)(PTC_REG_CONVRESULT_L);
+  sync_config();
+  uint16_t result = QTOUCH_PTC->RESULT.reg;
   Serial.println(result);
 
   return result;
@@ -137,21 +169,34 @@ int Adafruit_FreeTouch::getYLine(void) {
   int p = g_APinDescription[pin].ulPin;
   if (g_APinDescription[pin].ulPort == PORTA) {
     if ((p >= 2) && (p <= 7)) {
-      Serial.println("A");
-      Serial.println(p);
       return (p - 2);
     }
   }
   if (g_APinDescription[pin].ulPort == PORTB) {
     if ((p >= 0) && (p <= 9)) {
-      Serial.println("B");
       return (p + 6);
     }
   }
 
   // not valid
   return -1;
+}
 
+void Adafruit_FreeTouch::setCompCap(uint16_t cc) {
+  compcap = cc & 0x3FFF;
+
+  sync_config();
+  QTOUCH_PTC->COMPCAPL.bit.VALUE = compcap & 0xFF;
+  QTOUCH_PTC->COMPCAPH.bit.VALUE = (compcap>>8) & 0x3F;
+  sync_config();
+}
+
+void Adafruit_FreeTouch::setIntCap(uint8_t ic) {
+  intcap = ic & 0x3F;
+
+  sync_config();
+  QTOUCH_PTC->INTCAP.bit.VALUE = intcap & 0x3F;
+  sync_config();
 }
 
 void Adafruit_FreeTouch::setFilterLevel(filter_level_t lvl) {
@@ -186,6 +231,26 @@ void Adafruit_FreeTouch::setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hs) {
 }
 
 
+void Adafruit_FreeTouch::ptcInitSettings(void) {
+  ptcConfigIOpin();
+
+  enablePTC(false);  
+
+  QTOUCH_PTC->UNK4C04.reg &= 0xF7; //MEMORY[0x42004C04] &= 0xF7u;
+  QTOUCH_PTC->UNK4C04.reg &= 0xFB; //MEMORY[0x42004C04] &= 0xFBu;
+  QTOUCH_PTC->UNK4C04.reg &= 0xFC; //MEMORY[0x42004C04] &= 0xFCu;
+  sync_config();
+  QTOUCH_PTC->FREQCONTROL.reg &= 0x9F;       //MEMORY[0x42004C0C] &= 0x9Fu;
+  sync_config();
+  QTOUCH_PTC->FREQCONTROL.reg &= 0xEF;       //MEMORY[0x42004C0C] &= 0xEFu;
+  sync_config();
+  QTOUCH_PTC->FREQCONTROL.bit.SAMPLEDELAY = 0; //MEMORY[0x42004C0C] &= 0xF0u;
+  QTOUCH_PTC->CONTROLC.bit.INIT = 1;         //MEMORY[0x42004C05] |= 1u;
+  QTOUCH_PTC->CONTROLA.bit.RUNINSTANDBY = 1; //MEMORY[0x42004C00] |= 4u;
+  sync_config();
+  enablePTC(true);                           //MEMORY[0x42004C00] |= 2u;
+
+}
 
 void Adafruit_FreeTouch::ptcConfigIOpin(void) {
   uint32_t ulpin = g_APinDescription[pin].ulPin;
@@ -237,6 +302,16 @@ void Adafruit_FreeTouch::enableWCOint(boolean en) {
     QTOUCH_PTC->INTENABLE.bit.WCO = 1;
   } else {
     QTOUCH_PTC->INTDISABLE.bit.WCO = 1;
+  } 
+  sync_config();
+}
+
+void Adafruit_FreeTouch::enableEOCint(boolean en) {
+  sync_config();
+  if (en) {
+    QTOUCH_PTC->INTENABLE.bit.EOC = 1;
+  } else {
+    QTOUCH_PTC->INTDISABLE.bit.EOC = 1;
   } 
   sync_config();
 }
