@@ -1,7 +1,5 @@
 #include <Arduino.h>
-#include "touch.h"
-#include "touch_api_ptc.h"
-#include "Adafruit_ASFcore.h"
+#include <Adafruit_ASFcore.h>
 #include "variant.h"
 #include "gclk.h"
 #include "clock.h"
@@ -332,15 +330,67 @@ typedef struct {
 
 
 
+/* Touch library oversampling (filter) setting */
+typedef enum tag_oversample_level_t {
+	OVERSAMPLE_1,
+	OVERSAMPLE_2,
+	OVERSAMPLE_4,
+	OVERSAMPLE_8,
+	OVERSAMPLE_16,
+	OVERSAMPLE_32,
+	OVERSAMPLE_64
+}
+oversample_t;
+
+/* Touch library series resistor setting */
+typedef enum tag_series_resistor_t {
+	RESISTOR_0,
+	RESISTOR_20K,
+	RESISTOR_50K,
+	RESISTOR_100K,
+}
+series_resistor_t;
+
+typedef enum tag_freq_mode_t {
+	FREQ_MODE_NONE,
+	FREQ_MODE_HOP,
+	FREQ_MODE_SPREAD,
+	FREQ_MODE_SPREAD_MEDIAN
+}
+freq_mode_t;
+
+typedef enum tag_freq_hop_t {
+	FREQ_HOP_1,
+	FREQ_HOP_2,
+	FREQ_HOP_3,
+	FREQ_HOP_4,
+	FREQ_HOP_5,
+	FREQ_HOP_6,
+	FREQ_HOP_7,
+	FREQ_HOP_8,
+	FREQ_HOP_9,
+	FREQ_HOP_10,
+	FREQ_HOP_11,
+	FREQ_HOP_12,
+	FREQ_HOP_13,
+	FREQ_HOP_14,
+	FREQ_HOP_15,
+	FREQ_HOP_16
+}
+freq_hop_t;
+
+
+
 class Adafruit_FreeTouch {
  public:
-  Adafruit_FreeTouch(int p, filter_level_t f = FILTER_LEVEL_4, rsel_val_t r = RSEL_VAL_0, freq_mode_sel_t fh = FREQ_MODE_NONE);
+  Adafruit_FreeTouch(int p, oversample_t f = OVERSAMPLE_4, series_resistor_t r = RESISTOR_0, freq_mode_t fh = FREQ_MODE_NONE);
   bool begin(void);
 
   void ptcInitSettings(void);
   void ptcConfigIOpin(void);
   uint16_t startPtcAcquire(void);
-  uint16_t touchSelfcapSensorsMeasure(void);
+  uint16_t measure(void);
+  uint16_t measureRaw(void);
 
   // debugging helper!
   void snapshotRegsAndPrint(uint32_t base, uint8_t numregs);
@@ -350,9 +400,9 @@ class Adafruit_FreeTouch {
   void setupClock(void);
   int  getYLine(void);
   void selectYLine(void);
-  void setFilterLevel(filter_level_t lvl);
-  void setSeriesResistor(rsel_val_t res);
-  void setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hops = FREQ_HOP_SEL_1);
+  void setOversampling(oversample_t lvl);
+  void setSeriesResistor(series_resistor_t res);
+  void setFreqHopping(freq_mode_t fh, freq_hop_t hops = FREQ_HOP_1);
   void setCompCap(uint16_t cc);
   void setIntCap(uint8_t ic);
 
@@ -368,10 +418,10 @@ class Adafruit_FreeTouch {
  private:
   int pin;           // arduino pin #
   int8_t yline;      // the Y select line (see datasheet)
-  filter_level_t oversample;
-  rsel_val_t seriesres;
-  freq_mode_sel_t freqhop;
-  freq_hop_sel_t hops;
+  oversample_t oversample;
+  series_resistor_t seriesres;
+  freq_mode_t freqhop;
+  freq_hop_t hops;
   uint16_t compcap;
   uint8_t  intcap;
 };

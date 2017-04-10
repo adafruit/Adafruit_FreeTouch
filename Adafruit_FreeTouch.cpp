@@ -1,9 +1,8 @@
 /*
- * Adapted from the MicroPython NativeIO TouchIn code!
- *
+ * FreeTouch, a QTouch-compatible library - tested on ATSAMD21 only!
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Scott Shawcroft for Adafruit Industries
+ * Copyright (c) 2017 Limor 'ladyada' Fried for Adafruit Industries
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +27,7 @@
 
 
 
-Adafruit_FreeTouch::Adafruit_FreeTouch(int p, filter_level_t f, rsel_val_t r, freq_mode_sel_t fh) {
+Adafruit_FreeTouch::Adafruit_FreeTouch(int p, oversample_t f, series_resistor_t r, freq_mode_t fh) {
   pin = p;
   oversample = f;
   seriesres = r;
@@ -45,10 +44,8 @@ bool Adafruit_FreeTouch::begin(void) {
     return false;
 
   setupClock();
-  Serial.println("Clock set");
 
   ptcInitSettings();
-  Serial.println("PTC init");
 
   enablePTC(false);
 
@@ -56,15 +53,14 @@ bool Adafruit_FreeTouch::begin(void) {
   enableEOCint(false);
 
   // enable the sensor, only done once per line
-  Serial.println("Yline");
   if (yline < 8) {
     sync_config();
     QTOUCH_PTC->YENABLEL.reg |= 1 << yline;
     sync_config();
   } else if (yline < 16) {
     QTOUCH_PTC->YENABLEH.reg |= 1 << (yline - 8);
-  }  
-  Serial.println("Done");
+  }
+
   enablePTC(true);
 
   return true;
@@ -81,7 +77,27 @@ void Adafruit_FreeTouch::setupClock(void) {
 }
 
 
-uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
+uint16_t Adafruit_FreeTouch::measure(void) {
+  uint16_t m;
+
+  m = measureRaw();
+  if (m == -1) return -1;
+
+  // normalize the signal
+  switch (oversample) {
+    case OVERSAMPLE_1:   return m;
+    case OVERSAMPLE_2:   return m/2;
+    case OVERSAMPLE_4:   return m/4;
+    case OVERSAMPLE_8:   return m/8;
+    case OVERSAMPLE_16:  return m/16;
+    case OVERSAMPLE_32:  return m/32;
+    case OVERSAMPLE_64:  return m/64;
+  }
+
+  return -1; // shouldn't reach here but fail if we do!
+}
+
+uint16_t Adafruit_FreeTouch::measureRaw(void) {
   if (yline == -1) 
     return -1;
 
@@ -92,28 +108,25 @@ uint16_t Adafruit_FreeTouch::touchSelfcapSensorsMeasure(void) {
   enableWCOint(false);
   clearWCOintFlag();
   clearEOCintFlag();
-  // enable_eoc_int(); // not using irq for now
+  // enable_eoc_int(); // not using irq (for now)
 
   // set up pin!
-  Serial.print("Y Line #"); Serial.println(yline);
+  //Serial.print("Y Line #"); Serial.println(yline);
   selectYLine();
-  //snapshotRegsAndPrint(PTC_REG_YSELECT_L, 8);
   // set up sense resistor
-  //snapshotRegsAndPrint(PTC_REG_SERIESRES, 1);
   setSeriesResistor(seriesres);
   // set up prescalar
-  //snapshotRegsAndPrint(PTC_REG_CONVCONTROL, 1);
-  setFilterLevel(oversample);
+  setOversampling(oversample);
   // set up freq hopping
-  //snapshotRegsAndPrint(PTC_REG_FREQCONTROL, 1);
   setFreqHopping(freqhop, hops);
   // set up compensation cap + int (?) cap
-  //snapshotRegsAndPrint(PTC_REG_COMPCAPL, 2);
   setCompCap(compcap);
-  //snapshotRegsAndPrint(PTC_REG_INTCAP, 1);
   setIntCap(intcap);
-  sync_config();
+
   QTOUCH_PTC->BURSTMODE.reg = 0xA4;
+
+  sync_config();
+
 
   return startPtcAcquire();
 }
@@ -123,24 +136,12 @@ uint16_t Adafruit_FreeTouch::startPtcAcquire(void) {
 
   ptcAcquire();
 
-  //snapshotRegsAndPrint(0x42004C00, 48); // ptc
-  //snapshotRegsAndPrint(0x41004430, 5); // pmux
-  //snapshotRegsAndPrint(0x41004440, 5); // pinconfig
-  //Serial.println("\n\n");
-
-  digitalWrite(12, HIGH);
-  int counter = 0;
   while (QTOUCH_PTC->CONVCONTROL.bit.CONVERT) {
-    delay(1);
-    counter++;
+    yield();
   }
-  digitalWrite(12, LOW);
 
-  Serial.print("Conversion ended in ");
-  Serial.print(counter); Serial.print(" ms. Got: ");
   sync_config();
   uint16_t result = QTOUCH_PTC->RESULT.reg;
-  Serial.println(result);
 
   return result;
 }
@@ -199,7 +200,7 @@ void Adafruit_FreeTouch::setIntCap(uint8_t ic) {
   sync_config();
 }
 
-void Adafruit_FreeTouch::setFilterLevel(filter_level_t lvl) {
+void Adafruit_FreeTouch::setOversampling(oversample_t lvl) {
   oversample = lvl; // back it up for later
 
   sync_config();
@@ -207,7 +208,7 @@ void Adafruit_FreeTouch::setFilterLevel(filter_level_t lvl) {
   sync_config();
 }
 
-void Adafruit_FreeTouch::setSeriesResistor(rsel_val_t res) {
+void Adafruit_FreeTouch::setSeriesResistor(series_resistor_t res) {
   seriesres = res;
 
   sync_config();
@@ -215,7 +216,7 @@ void Adafruit_FreeTouch::setSeriesResistor(rsel_val_t res) {
   sync_config();
 }
 
-void Adafruit_FreeTouch::setFreqHopping(freq_mode_sel_t fh, freq_hop_sel_t hs) {
+void Adafruit_FreeTouch::setFreqHopping(freq_mode_t fh, freq_hop_t hs) {
   freqhop = fh;
   hops = hs;
 
@@ -258,17 +259,18 @@ void Adafruit_FreeTouch::ptcConfigIOpin(void) {
   
   PORT->Group[ulport].PINCFG[ulpin].reg = 0x3;  // pmuxen + input
 
-  uint8_t pmux = PORT->Group[ulport].PMUX[(ulpin - (ulport*32))/2].reg;
+  uint8_t curr_pmux = (PORT->Group[ulport].PMUX[ulpin/2].reg);
+
   if (ulpin & 1) {
     // pmuxodd
-    pmux &= 0x0F; // keep the even mux data
-    pmux |= 0x10; // set to mux B
+    curr_pmux &= PORT_PMUX_PMUXE(0xF); // keep the even mux data
+    curr_pmux |= PORT_PMUX_PMUXO(0x1); // set to mux B
   } else {
     // pmuxeven
-    pmux &= 0xF0;  // keep the odd mux data
-    pmux |= 0x01;  // set to mux B
+    curr_pmux &= PORT_PMUX_PMUXO(0xF); // keep the odd mux data
+    curr_pmux |= PORT_PMUX_PMUXE(0x1); // set to mux B
   }
-  PORT->Group[ulport].PMUX[(ulpin - (ulport*32))/2].reg = pmux;
+  PORT->Group[ulport].PMUX[ulpin/2].reg = curr_pmux;
 }
 
 
@@ -280,7 +282,6 @@ void Adafruit_FreeTouch::runInStandby(boolean en) {
   } else {
     QTOUCH_PTC->CONTROLA.bit.RUNINSTANDBY = 0;
   }
-  //Serial.print("ControlA: "); Serial.println(QTOUCH_PTC->CONTROLA.reg, HEX);
   sync_config();
 }
 
@@ -292,7 +293,6 @@ void Adafruit_FreeTouch::enablePTC(boolean en) {
   } else {
     QTOUCH_PTC->CONTROLA.bit.ENABLE = 0;
   }
-  //Serial.print("ControlA: "); Serial.println(QTOUCH_PTC->CONTROLA.reg, HEX);
   sync_config();
 }
 
@@ -330,11 +330,8 @@ void Adafruit_FreeTouch::clearEOCintFlag(void) {
 
 
 void Adafruit_FreeTouch::ptcAcquire(void) {
-  Serial.println("\t****Acquiring****");
   sync_config();
-
   QTOUCH_PTC->CONVCONTROL.bit.CONVERT = 1;
-  //Serial.print("ConvCtrl: "); Serial.println(QTOUCH_PTC->CONVCONTROL.reg, HEX);
   sync_config();
 }
 
