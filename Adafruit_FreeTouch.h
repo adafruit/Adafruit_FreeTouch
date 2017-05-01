@@ -29,6 +29,10 @@ class Adafruit_FreeTouch {
   void setCompCap(uint16_t cc);
   void setIntCap(uint8_t ic);
 
+  void snapshotRegsAndPrint(uint32_t base, uint8_t numregs);
+  void printHex(uint8_t h, boolean newline);
+  void printPTCregs(uint32_t base, uint8_t *regs, uint8_t num);
+
  private:
     int pin;           // arduino pin #
     struct adafruit_ptc_config config;
