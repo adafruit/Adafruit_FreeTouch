@@ -383,19 +383,16 @@ freq_hop_t;
 
 class Adafruit_FreeTouch {
  public:
-  Adafruit_FreeTouch(int p, oversample_t f = OVERSAMPLE_4, series_resistor_t r = RESISTOR_0, freq_mode_t fh = FREQ_MODE_NONE);
+  Adafruit_FreeTouch(int p = 0, oversample_t f = OVERSAMPLE_4, series_resistor_t r = RESISTOR_0, freq_mode_t fh = FREQ_MODE_NONE);
   bool begin(void);
 
-  void ptcInitSettings(void);
-  void ptcConfigIOpin(void);
-  uint16_t startPtcAcquire(void);
   uint16_t measure(void);
   uint16_t measureRaw(void);
 
-  // debugging helper!
-  void snapshotRegsAndPrint(uint32_t base, uint8_t numregs);
-  void printPTCregs(uint32_t base, uint8_t *regs, uint8_t num);
-  void printHex(uint8_t h, boolean newline);
+ private:
+  void ptcInitSettings(void);
+  void ptcConfigIOpin(void);
+  uint16_t startPtcAcquire(void);
 
   void setupClock(void);
   int  getYLine(void);
@@ -415,7 +412,12 @@ class Adafruit_FreeTouch {
   void ptcAcquire(void);
   void sync_config(void);
 
- private:
+  // debugging helper!
+  void snapshotRegsAndPrint(uint32_t base, uint8_t numregs);
+  void printPTCregs(uint32_t base, uint8_t *regs, uint8_t num);
+  void printHex(uint8_t h, boolean newline);
+
+
   int pin;           // arduino pin #
   int8_t yline;      // the Y select line (see datasheet)
   oversample_t oversample;
