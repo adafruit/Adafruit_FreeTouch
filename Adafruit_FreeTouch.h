@@ -2,10 +2,6 @@
 #define ADAFRUIT_FREETOUCH_H
 
 #include <Arduino.h>
-#include <Adafruit_ASFcore.h>
-#include "variant.h"
-#include "gclk.h"
-#include "clock.h"
 #include "adafruit_ptc.h"
 
 class Adafruit_FreeTouch {

@@ -46,14 +46,58 @@ bool Adafruit_FreeTouch::begin(void) {
         return false;
     }
 
-    /* Setup and enable generic clock source for PTC module. */
-    struct system_gclk_chan_config gclk_chan_conf;
-    system_gclk_chan_get_config_defaults(&gclk_chan_conf);
-    gclk_chan_conf.source_generator = GCLK_GENERATOR_3;
-    system_gclk_chan_set_config(PTC_GCLK_ID, &gclk_chan_conf);
-    system_gclk_chan_enable(PTC_GCLK_ID);
-    system_apb_clock_set_mask(SYSTEM_CLOCK_APB_APBC, PM_APBCMASK_PTC);
-
+    /* Setup and enable generic clock source for PTC module.
+       struct system_gclk_chan_config gclk_chan_conf;
+       system_gclk_chan_get_config_defaults(&gclk_chan_conf);
+    */
+    
+    uint8_t channel = PTC_GCLK_ID;
+    uint8_t source_generator = 1;
+    
+    // original line: system_gclk_chan_set_config(PTC_GCLK_ID, &gclk_chan_conf);
+    uint32_t new_clkctrl_config = (channel << GCLK_CLKCTRL_ID_Pos);  // from gclk.c
+    
+    // original line: gclk_chan_conf.source_generator = GCLK_GENERATOR_1;
+    /* Select the desired generic clock generator */
+    new_clkctrl_config |= source_generator << GCLK_CLKCTRL_GEN_Pos;  // from gclk.c
+    
+    /* Disable generic clock channel */
+    // original line: system_gclk_chan_disable(channel);
+    noInterrupts();
+    
+    /* Select the requested generator channel */
+    *((uint8_t*)&GCLK->CLKCTRL.reg) = channel;
+    
+    /* Sanity check WRTLOCK */
+    //Assert(!GCLK->CLKCTRL.bit.WRTLOCK);
+    
+    /* Switch to known-working source so that the channel can be disabled */
+    uint32_t prev_gen_id = GCLK->CLKCTRL.bit.GEN;
+    GCLK->CLKCTRL.bit.GEN = 0;
+    
+    /* Disable the generic clock */
+    GCLK->CLKCTRL.reg &= ~GCLK_CLKCTRL_CLKEN;
+    while (GCLK->CLKCTRL.reg & GCLK_CLKCTRL_CLKEN) {
+      /* Wait for clock to become disabled */
+    }
+    
+    /* Restore previous configured clock generator */
+    GCLK->CLKCTRL.bit.GEN = prev_gen_id;
+    
+    //system_interrupt_leave_critical_section();  
+    interrupts();
+    
+    /* Write the new configuration */
+    GCLK->CLKCTRL.reg = new_clkctrl_config;
+    
+    // original line: system_gclk_chan_enable(PTC_GCLK_ID);
+    *((uint8_t*)&GCLK->CLKCTRL.reg) = channel;
+    GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;	/* Enable the generic clock */
+    
+    
+    // original line: system_apb_clock_set_mask(SYSTEM_CLOCK_APB_APBC, PM_APBCMASK_PTC);
+    PM->APBCMASK.reg |= PM_APBCMASK_PTC;
+    
     adafruit_ptc_init(PTC, &config);
 
     return true;
