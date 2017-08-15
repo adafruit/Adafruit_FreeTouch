@@ -64,13 +64,13 @@ typedef union {
   uint8_t reg;
 } PTC_REG_CONTROLB_Type;
 
-/*************** UNK4C04 register ***************/
+/*************** UNKXC04 register ***************/
 
-#define PTC_REG_UNK4C04 0x42004C04
+#define PTC_REG_UNKXC04 0x42004C04
 
 typedef union {
   uint8_t reg;
-} PTC_REG_UNK4C04_Type;
+} PTC_REG_UNKXC04_Type;
 
 
 /*************** CONTROL C register ***************/
@@ -309,7 +309,7 @@ typedef struct {
   __IO PTC_REG_CONTROLB_Type CONTROLB;    // 0x42004C01
   uint8_t   __pad4c02__;                // 0x42004C02 unknown
   uint8_t   __pad4c03__;                // 0x42004C03 unknown
-  __IO PTC_REG_UNK4C04_Type  UNK4C04;   // 0x42004C04 unknown
+  __IO PTC_REG_UNKXC04_Type  UNKXC04;   // 0x42004C04 unknown
   __IO PTC_REG_CONTROLC_Type CONTROLC;    // 0x42004C05
   uint8_t   __pad4c06__;                // 0x42004C06 unknown
   uint8_t   __pad4c07__;                // 0x42004C07 unknown

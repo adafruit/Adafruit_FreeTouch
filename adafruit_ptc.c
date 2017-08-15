@@ -57,9 +57,9 @@ void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* confi
     // Configure a block of as-yet unidentified configuration registers. If
     // you know what these do, please contact Jeremy Gilbert
     sync_config(module_inst);
-    module_inst->UNK4C04.reg &= 0xF7; //MEMORY[0x42004C04] &= 0xF7u;
-    module_inst->UNK4C04.reg &= 0xFB; //MEMORY[0x42004C04] &= 0xFBu;
-    module_inst->UNK4C04.reg &= 0xFC; //MEMORY[0x42004C04] &= 0xFCu;
+    module_inst->UNKXC04.reg &= 0xF7; //MEMORY[0x42004C04] &= 0xF7u;
+    module_inst->UNKXC04.reg &= 0xFB; //MEMORY[0x42004C04] &= 0xFBu;
+    module_inst->UNKXC04.reg &= 0xFC; //MEMORY[0x42004C04] &= 0xFCu;
 
     // Frequency control (unclear what this does in self-capacitance mode)
     sync_config(module_inst);
