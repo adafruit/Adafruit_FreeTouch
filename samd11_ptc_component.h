@@ -23,7 +23,10 @@
  * THE SOFTWARE.
  */
 
-// Added by Jeremy Gilbert
+// Added by Jeremy Gilbert.
+
+// On the SAMD11 architecture, the PTC register block begins at 0x42002C
+// instead of 0x42004C
 
 // This is similar to the component definitions found in
 // sam0/utils/cmsis/samd21/include/component but for the PTC.
