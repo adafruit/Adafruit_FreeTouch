@@ -31,6 +31,7 @@
 
 
 #include "samd21_ptc_component.h"
+#include "samd11_ptc_component.h"
 
 #ifdef __cplusplus
 extern "C" {

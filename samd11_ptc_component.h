@@ -23,12 +23,14 @@
  * THE SOFTWARE.
  */
 
+// Added by Jeremy Gilbert
+
 // This is similar to the component definitions found in
 // sam0/utils/cmsis/samd21/include/component but for the PTC.
-#ifndef ADAFRUIT_FREETOUCH_PTC_COMPONENT_SAMD21_H
-#define ADAFRUIT_FREETOUCH_PTC_COMPONENT_SAMD21_H
+#ifndef ADAFRUIT_FREETOUCH_PTC_COMPONENT_SAMD11_H
+#define ADAFRUIT_FREETOUCH_PTC_COMPONENT_SAMD11_H
 
-#ifdef __SAMD21G18A__
+#ifdef __SAMD11D14AM__
 
 #define     __O     volatile             /*!< Defines 'write only' permissions                */
 #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
@@ -36,7 +38,7 @@
 #undef ENABLE
 
 /*************** CONTROL A register ***************/
-#define PTC_REG_CONTROLA   0x42004C00
+#define PTC_REG_CONTROLA   0x42002C00
 #define PTC_BIT_ENABLE     0x02
 #define PTC_BIT_RUNINSTBY  0x04
 
@@ -53,7 +55,7 @@ typedef union {
 
 /*************** CONTROL B register ***************/
 
-#define PTC_REG_CONTROLB 0x42004C01
+#define PTC_REG_CONTROLB 0x42002C01
 #define PTC_BIT_SYNCFLAG 0x80
 
 typedef union {
@@ -66,7 +68,7 @@ typedef union {
 
 /*************** UNKXC04 register ***************/
 
-#define PTC_REG_UNKXC04 0x42004C04
+#define PTC_REG_UNKXC04 0x42002C04
 
 typedef union {
   uint8_t reg;
@@ -75,7 +77,7 @@ typedef union {
 
 /*************** CONTROL C register ***************/
 
-#define PTC_REG_CONTROLC 0x42004C05
+#define PTC_REG_CONTROLC 0x42002C05
 #define PTC_BIT_INIT 0x01
 
 typedef union {
@@ -100,12 +102,12 @@ typedef union {
 } PTC_REG_INT_Type;
 
 
-#define PTC_REG_INTDISABLE 0x42004C08
-#define PTC_REG_INTENABLE 0x42004C09
+#define PTC_REG_INTDISABLE 0x42002C08
+#define PTC_REG_INTENABLE 0x42002C09
 #define PTC_BIT_EOCINTEN  0x01
 #define PTC_BIT_WCOINTEN  0x02
 
-#define PTC_REG_INTFLAGS 0x42004C0A
+#define PTC_REG_INTFLAGS 0x42002C0A
 #define PTC_BIT_EOCINTFLAG 0x01
 #define PTC_BIT_WCOINTFLAG 0x02
 
@@ -121,7 +123,7 @@ typedef union {
   uint8_t reg;
 } PTC_REG_FREQCONTROL_Type;
 
-#define PTC_REG_FREQCONTROL 0x42004C0C
+#define PTC_REG_FREQCONTROL 0x42002C0C
 #define PTC_BIT_FREQSPREADEN 0x10
 #define PTC_REG_SAMPLEDELAY_MASK 0x0F
 
@@ -137,7 +139,7 @@ typedef union {
 } __attribute__ ((packed)) PTC_REG_CONVCONTROL_Type;
 
 
-#define PTC_REG_CONVCONTROL 0x42004C0D
+#define PTC_REG_CONVCONTROL 0x42002C0D
 #define PTC_BIT_CONVSTARTED 0x80
 #define PTC_REG_ADCACC_MASK 0x07
 
@@ -172,11 +174,11 @@ typedef union {
   uint8_t reg;
 } __attribute__ ((packed)) PTC_REG_YSELECTH_Type;
 
-#define PTC_REG_YSELECT_L 0x42004C10
-#define PTC_REG_YSELECT_H 0x42004C11
+#define PTC_REG_YSELECT_L 0x42002C10
+#define PTC_REG_YSELECT_H 0x42002C11
 
-#define PTC_REG_YENABLE_L 0x42004C14
-#define PTC_REG_YENABLE_H 0x42004C15
+#define PTC_REG_YENABLE_L 0x42002C14
+#define PTC_REG_YENABLE_H 0x42002C15
 
 
 /*************** X SELECT L+H reg ***************/
@@ -210,11 +212,11 @@ typedef union {
 } __attribute__ ((packed)) PTC_REG_XSELECTH_Type;
 
 
-#define PTC_REG_XSELECT_L 0x42004C12
-#define PTC_REG_XSELECT_H 0x42004C13
+#define PTC_REG_XSELECT_L 0x42002C12
+#define PTC_REG_XSELECT_H 0x42002C13
 
-#define PTC_REG_XENABLE_L 0x42004C16
-#define PTC_REG_XENABLE_H 0x42004C17
+#define PTC_REG_XENABLE_L 0x42002C16
+#define PTC_REG_XENABLE_H 0x42002C17
 
 /*************** Compensation Cap reg ***************/
 
@@ -233,8 +235,8 @@ typedef union {
   uint8_t reg;
 } __attribute__ ((packed)) PTC_REG_COMPCAPH_Type;
 
-#define PTC_REG_COMPCAPL    0x42004C18
-#define PTC_REG_COMPCAPH    0x42004C19
+#define PTC_REG_COMPCAPL    0x42002C18
+#define PTC_REG_COMPCAPH    0x42002C19
 
 /*************** Int Cap reg ***************/
 
@@ -247,7 +249,7 @@ typedef union {
 } __attribute__ ((packed)) PTC_REG_INTCAP_Type;
 
 
-#define PTC_REG_INTCAP    0x42004C1A
+#define PTC_REG_INTCAP    0x42002C1A
 
 /*************** Series resistor reg ***************/
 
@@ -259,7 +261,7 @@ typedef union {
   uint8_t reg;
 } __attribute__ ((packed)) PTC_REG_SERRES_Type;
 
-#define PTC_REG_SERIESRES    0x42004C1B
+#define PTC_REG_SERIESRES    0x42002C1B
 
 /*************** conversion result reg ***************/
 
@@ -271,8 +273,8 @@ typedef union {
   uint16_t reg;
 } __attribute__ ((packed)) PTC_REG_CONVRESULT_Type;
 
-#define PTC_REG_CONVRESULT_L 0x42004C1C
-#define PTC_REG_CONVRESULT_H 0x42004C1D
+#define PTC_REG_CONVRESULT_L 0x42002C1C
+#define PTC_REG_CONVRESULT_H 0x42002C1D
 
 /*************** burst mode reg ***************/
 
@@ -287,68 +289,68 @@ typedef union {
 } __attribute__ ((packed)) PTC_REG_BURSTMODE_Type;
 
 
-#define PTC_REG_BURSTMODE     0x42004C20
+#define PTC_REG_BURSTMODE     0x42002C20
 #define PTC_REG_BURSTMODE_MASK   0xF0
 #define PTC_BIT_CTSLOWPOWER   0x04
 
 /*************** etc unused reg ***************/
 
-#define PTC_REG_XYENABLE     0x42004C16
+#define PTC_REG_XYENABLE     0x42002C16
 #define PTC_BIT_XYENABLE     0x02
 
-#define PTC_REG_WCO_MODE     0x42004C21
+#define PTC_REG_WCO_MODE     0x42002C21
 #define PTC_REG_WCO_MODE_MASK   0x07
 
-#define PTC_SET_WCO_THRESHHOLD_A_L 0x42004C24
-#define PTC_SET_WCO_THRESHHOLD_A_H 0x42004C25
-#define PTC_SET_WCO_THRESHHOLD_B_L 0x42004C26
-#define PTC_SET_WCO_THRESHHOLD_B_H 0x42004C27
+#define PTC_SET_WCO_THRESHHOLD_A_L 0x42002C24
+#define PTC_SET_WCO_THRESHHOLD_A_H 0x42002C25
+#define PTC_SET_WCO_THRESHHOLD_B_L 0x42002C26
+#define PTC_SET_WCO_THRESHHOLD_B_H 0x42002C27
 
 typedef struct {
-  __IO PTC_REG_CONTROLA_Type CONTROLA;    // 0x42004C00
-  __IO PTC_REG_CONTROLB_Type CONTROLB;    // 0x42004C01
-  uint8_t   __pad4c02__;                // 0x42004C02 unknown
-  uint8_t   __pad4c03__;                // 0x42004C03 unknown
-  __IO PTC_REG_UNKXC04_Type  UNKXC04;   // 0x42004C04 unknown
-  __IO PTC_REG_CONTROLC_Type CONTROLC;    // 0x42004C05
-  uint8_t   __pad4c06__;                // 0x42004C06 unknown
-  uint8_t   __pad4c07__;                // 0x42004C07 unknown
-  __IO PTC_REG_INT_Type      INTDISABLE;  // 0x42004C08
-  __IO PTC_REG_INT_Type      INTENABLE;   // 0x42004C09
-  __IO PTC_REG_INT_Type      INTFLAGS;    // 0x42004C0A
-  uint8_t   __pad4c0b__;                // 0x42004C0B unknown
-  __IO PTC_REG_FREQCONTROL_Type FREQCONTROL;  //0x42004C0C
-  __IO PTC_REG_CONVCONTROL_Type CONVCONTROL;  // 0x42004C0D
-  uint8_t   __pad4c0e__;                // 0x42004C0E unknown
-  uint8_t   __pad4c0f__;                // 0x42004C0F unknown
-  __IO PTC_REG_YSELECTL_Type YSELECTL;  // 0x42004C10
-  __IO PTC_REG_YSELECTL_Type YSELECTH;  // 0x42004C11
-  __IO PTC_REG_XSELECTL_Type XSELECTL;  // 0x42004C12
-  __IO PTC_REG_XSELECTL_Type XSELECTH;  // 0x42004C13
-  __IO PTC_REG_YSELECTL_Type YENABLEL;  // 0x42004C14
-  __IO PTC_REG_YSELECTL_Type YENABLEH;  // 0x42004C15
-  __IO PTC_REG_XSELECTL_Type XENABLEL;  // 0x42004C16
-  __IO PTC_REG_XSELECTL_Type XENABLEH;  // 0x42004C17
+  __IO PTC_REG_CONTROLA_Type CONTROLA;    // 0x42002C00
+  __IO PTC_REG_CONTROLB_Type CONTROLB;    // 0x42002C01
+  uint8_t   __pad4c02__;                // 0x42002C02 unknown
+  uint8_t   __pad4c03__;                // 0x42002C03 unknown
+  __IO PTC_REG_UNKXC04_Type  UNKXC04;   // 0x42002C04 unknown
+  __IO PTC_REG_CONTROLC_Type CONTROLC;    // 0x42002C05
+  uint8_t   __pad4c06__;                // 0x42002C06 unknown
+  uint8_t   __pad4c07__;                // 0x42002C07 unknown
+  __IO PTC_REG_INT_Type      INTDISABLE;  // 0x42002C08
+  __IO PTC_REG_INT_Type      INTENABLE;   // 0x42002C09
+  __IO PTC_REG_INT_Type      INTFLAGS;    // 0x42002C0A
+  uint8_t   __pad4c0b__;                // 0x42002C0B unknown
+  __IO PTC_REG_FREQCONTROL_Type FREQCONTROL;  //0x42002C0C
+  __IO PTC_REG_CONVCONTROL_Type CONVCONTROL;  // 0x42002C0D
+  uint8_t   __pad4c0e__;                // 0x42002C0E unknown
+  uint8_t   __pad4c0f__;                // 0x42002C0F unknown
+  __IO PTC_REG_YSELECTL_Type YSELECTL;  // 0x42002C10
+  __IO PTC_REG_YSELECTL_Type YSELECTH;  // 0x42002C11
+  __IO PTC_REG_XSELECTL_Type XSELECTL;  // 0x42002C12
+  __IO PTC_REG_XSELECTL_Type XSELECTH;  // 0x42002C13
+  __IO PTC_REG_YSELECTL_Type YENABLEL;  // 0x42002C14
+  __IO PTC_REG_YSELECTL_Type YENABLEH;  // 0x42002C15
+  __IO PTC_REG_XSELECTL_Type XENABLEL;  // 0x42002C16
+  __IO PTC_REG_XSELECTL_Type XENABLEH;  // 0x42002C17
 
-  __IO PTC_REG_COMPCAPL_Type COMPCAPL;  // 0x42004C18
-  __IO PTC_REG_COMPCAPH_Type COMPCAPH;  // 0x42004C19
-  __IO PTC_REG_INTCAP_Type   INTCAP;    // 0x42004C1A
-  __IO PTC_REG_SERRES_Type   SERRES;    // 0x42004C1B
+  __IO PTC_REG_COMPCAPL_Type COMPCAPL;  // 0x42002C18
+  __IO PTC_REG_COMPCAPH_Type COMPCAPH;  // 0x42002C19
+  __IO PTC_REG_INTCAP_Type   INTCAP;    // 0x42002C1A
+  __IO PTC_REG_SERRES_Type   SERRES;    // 0x42002C1B
 
-  __IO PTC_REG_CONVRESULT_Type RESULT;  // 0x42004C1C + 0x42004C1D
-  uint8_t   __pad4c1e__;                // 0x42004C1E unknown
-  uint8_t   __pad4c1f__;                // 0x42004C1F unknown
-  __IO PTC_REG_BURSTMODE_Type BURSTMODE; // 0x42004C20
+  __IO PTC_REG_CONVRESULT_Type RESULT;  // 0x42002C1C + 0x42002C1D
+  uint8_t   __pad4c1e__;                // 0x42002C1E unknown
+  uint8_t   __pad4c1f__;                // 0x42002C1F unknown
+  __IO PTC_REG_BURSTMODE_Type BURSTMODE; // 0x42002C20
 } Ptc;
 
-#define PTC  (( Ptc *)0x42004C00U)
+#define PTC  (( Ptc *)0x42002C00U)
 
-#define PTC_REG_INTDISABLE 0x42004C08
-#define PTC_REG_INTENABLE 0x42004C09
+#define PTC_REG_INTDISABLE 0x42002C08
+#define PTC_REG_INTENABLE 0x42002C09
 #define PTC_BIT_EOCINTEN  0x01
 #define PTC_BIT_WCOINTEN  0x02
 
-#define PTC_REG_INTFLAGS 0x42004C0A
+#define PTC_REG_INTFLAGS 0x42002C0A
 
 #endif
 
