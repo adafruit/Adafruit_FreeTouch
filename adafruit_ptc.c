@@ -26,6 +26,7 @@
 #include "adafruit_ptc.h"
 #include "pinmux.h"
 
+
 static void sync_config(Ptc const* module_inst) {
     while (module_inst->CONTROLB.bit.SYNCFLAG) ;
 }
@@ -138,7 +139,7 @@ void adafruit_ptc_start_conversion(Ptc* module_inst, struct adafruit_ptc_config 
     sync_config(module_inst);
 }
 
-bool adafruit_ptc_is_conversion_finished(Ptc* module_inst) {
+int adafruit_ptc_is_conversion_finished(Ptc* module_inst) {
     return module_inst->CONVCONTROL.bit.CONVERT == 0;
 }
 

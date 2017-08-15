@@ -28,7 +28,10 @@
 #ifndef ADAFRUIT_FREETOUCH_PTC_COMPONENT_H
 #define ADAFRUIT_FREETOUCH_PTC_COMPONENT_H
 
-#include "compiler.h"
+// #include "compiler.h"
+
+#define     __O     volatile             /*!< Defines 'write only' permissions                */
+#define     __IO    volatile             /*!< Defines 'read / write' permissions              */
 
 #undef ENABLE
 
