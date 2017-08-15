@@ -193,7 +193,7 @@ bool Adafruit_FreeTouch::begin(void) {
     // Note to developers: pinMode() appears to be the "safest" way to do
     // peripheral selection because it ensures a single code-path inside
     // ArduinoCore handles pinmux. Arduino "Input" mode is equivilent to
-    // peripheral "A", and this has been empirically confirmed.
+    // peripheral "B", and this has been empirically confirmed.
 
     pinMode( pin, INPUT );
 

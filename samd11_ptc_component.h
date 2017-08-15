@@ -25,8 +25,8 @@
 
 // Added by Jeremy Gilbert.
 
-// On the SAMD11 architecture, the PTC register block begins at 0x42002C
-// instead of 0x42004C
+// On the SAMD11 architecture, the PTC register block begins at 0x42002Cxx
+// instead of 0x42004Cxx
 
 // This is similar to the component definitions found in
 // sam0/utils/cmsis/samd21/include/component but for the PTC.

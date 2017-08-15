@@ -28,7 +28,7 @@ Until now, the PTC has been closed source and is undocumented, meaning you have 
 
 # Project status
 
-LibrePTC is aimed to give PTC access for the casual hobbyist. I'm aiming to create a stable library that you can drop into your weekend project. Everything is released under a permissive MIT license.
+This library is aimed to give PTC access for the casual hobbyist. The aim is to create a stable library that you can drop into your weekend project. Everything is released under a permissive MIT license.
 
 If you are looking for robust, production-ready tools, please do not consider this library. Please use QTouch. You'll get tons of free support from Atmel and only they really know how they're hardware works. Got it? We'd rather not see fleets of self-driving cars or medical devices running around the world with capacitive buttons that usie a handful of poorly understood, undocumented registers. 'nuff said.
 
@@ -43,6 +43,14 @@ If you are looking for robust, production-ready tools, please do not consider th
 [Atmel QTouch Library User Guide](http://www.atmel.com/images/doc8207.pdf) (8207L-AT42-05/12) - Older document describing QTouch for the AVRs but useful to understand the terminology
 
 [QTouch atmel-42195-qtouch-library-peripheral-touch-controller_user-guide](http://ww1.microchip.com/downloads/en/DeviceDoc/atmel-42195-qtouch-library-peripheral-touch-controller_user-guide.pdf) - The full user guide to the latest QTouch controller
+
+
+# Basic pin mapping
+
+On the SAMD21, there are a total of 9 pins that are able to be used for self-capacitive sensing (which is the sort of sensing this library supports.) Those pins are PA2, PA3, PA8, PA4, PA05, PA06, PA07, PB02, PB03.
+
+On the SAMD11 there are fourteen pins that are supported: A2, A3, A4, A5, A6, A7, A8, A10, A11, A14, A15, A10, A11, A16. However, note that if you also want to use I2C you will be limited to only 12 of these 14 pins.
+
 
 # Library details
 
@@ -82,11 +90,13 @@ Look in the PTC column on the far right and you can see if the GPIO pin can hand
 
 ![](images/samd11-pinouts-2.png)
 
-This chart is vital for setting up a project using either QTouch or LibrePTC libraries. To read a sensor, you must provide the library a "Y" channel to read. Be careful! Some pins may already  be in use for things like your clock or I2C. For instance, PA22 and PA23 on the D11 chips can be used as PTC lines Y12 and Y13. But those two pins are assigned by the ArduinoCore to SDA and SCL already and in fact are only one of the two possible pairs of pins that can be mapped to the I2C hardware.
+This chart is vital for setting up a project using either QTouch or this library. To read a sensor, you must provide the library a "Y" channel to read. Be careful! Some pins may already  be in use for things like your clock or I2C. For instance, PA22 and PA23 on the D11 chips can be used as PTC lines Y12 and Y13. But those two pins are assigned by the ArduinoCore to SDA and SCL already and in fact are only one of the two possible pairs of pins that can be mapped to the I2C hardware.
 
 Another gotcha: Some Y lines don't map to physical pins on all variants. For instance Y10-Y13 on the SAMD21 architecture is not broken out on the "G" version of the chip, which is the most commonly-used variant (driving nearly all of the Arduino-Compatible SAMD cores.) This quirk is why the D11 architecture actually has more capacitive sensing lines than its big brother D21-G.
 
-Just remember the API to LibrePTC is expecting you to provide it the Y line you want to measure.
+Just remember the API to is expecting you to provide it the Y line you want to measure and read the data sheet carefully.
+
+
 
 
 
