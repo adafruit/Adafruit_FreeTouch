@@ -26,6 +26,9 @@
 #include "adafruit_ptc.h"
 // #include "pinmux.h"
 
+// Spin-waits until a clock-synchronization boundary is reached. Needed when
+// reading and writing memory registers in a peripheral that may potentially
+// be clocked differently than the ARM CPU.
 
 static void sync_config(Ptc const* module_inst) {
     while (module_inst->CONTROLB.bit.SYNCFLAG) ;
@@ -47,23 +50,39 @@ void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* confi
     // without pullups. In this library, that functionality is handled by the OO class.
 
     sync_config(module_inst);
+    // Disable PTC (needed for many register writes to be successful)
     module_inst->CONTROLA.bit.ENABLE = 0;
-    sync_config(module_inst);
 
+
+    // Configure a block of as-yet unidentified configuration registers. If
+    // you know what these do, please contact Jeremy Gilbert
+    sync_config(module_inst);
     module_inst->UNK4C04.reg &= 0xF7; //MEMORY[0x42004C04] &= 0xF7u;
     module_inst->UNK4C04.reg &= 0xFB; //MEMORY[0x42004C04] &= 0xFBu;
     module_inst->UNK4C04.reg &= 0xFC; //MEMORY[0x42004C04] &= 0xFCu;
+
+    // Frequency control (unclear what this does in self-capacitance mode)
     sync_config(module_inst);
     module_inst->FREQCONTROL.reg &= 0x9F;       //MEMORY[0x42004C0C] &= 0x9Fu;
     sync_config(module_inst);
     module_inst->FREQCONTROL.reg &= 0xEF;       //MEMORY[0x42004C0C] &= 0xEFu;
     sync_config(module_inst);
     module_inst->FREQCONTROL.bit.SAMPLEDELAY = 0; //MEMORY[0x42004C0C] &= 0xF0u;
+
+    // Initialize the entire peripheral
+    // NB: The Atmel libraries do this FIRST and the Adafruit does it much later.
+    // Leaving it that way since I'm assuming AF has inside info.
+    // Why no sync_config() here?
     module_inst->CONTROLC.bit.INIT = 1;         //MEMORY[0x42004C05] |= 1u;
     module_inst->CONTROLA.bit.RUNINSTANDBY = 1; //MEMORY[0x42004C00] |= 4u;
     sync_config(module_inst);
+
+    // Don't know what WCO interrupt does exactly but I think it is related to
+    // autoreading
     module_inst->INTDISABLE.bit.WCO = 1;
     sync_config(module_inst);
+
+    // EOC is the "end of conversion" interrupt.
     module_inst->INTDISABLE.bit.EOC = 1;
     sync_config(module_inst);
 
@@ -75,8 +94,11 @@ void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* confi
     } else if (config->yline < 16) {
         module_inst->YENABLEH.reg |= 1 << (config->yline - 8);
     }
-
     sync_config(module_inst);
+
+    // Re-enable the module, which has the likely side effect of latching some
+    // of the above configuration into somewhere outside of the memory mapped
+    // IO space. A similiar pattern is seen with the Atmel ADC module. 
     module_inst->CONTROLA.bit.ENABLE = 1;
     sync_config(module_inst);
 }
