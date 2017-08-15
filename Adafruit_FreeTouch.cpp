@@ -94,10 +94,20 @@ bool Adafruit_FreeTouch::begin(void) {
     *((uint8_t*)&GCLK->CLKCTRL.reg) = channel;
     GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;	/* Enable the generic clock */
     
-    
+
     // original line: system_apb_clock_set_mask(SYSTEM_CLOCK_APB_APBC, PM_APBCMASK_PTC);
     PM->APBCMASK.reg |= PM_APBCMASK_PTC;
     
+    // Ensure the pin is tri-stated with no-pullups (necessary for PTC to
+    // work).
+    //
+    // Note to developers: pinMode() appears to be the "safest" way to do
+    // peripheral selection because it ensures a single code-path inside
+    // ArduinoCore handles pinmux. Arduino "Input" mode is equivilent to
+    // peripheral "A", and this has been empirically confirmed.
+
+    pinMode( pin, INPUT );
+
     adafruit_ptc_init(PTC, &config);
 
     return true;

@@ -24,7 +24,7 @@
  */
 
 #include "adafruit_ptc.h"
-#include "pinmux.h"
+// #include "pinmux.h"
 
 
 static void sync_config(Ptc const* module_inst) {
@@ -42,11 +42,9 @@ void adafruit_ptc_get_config_default(struct adafruit_ptc_config *config) {
 }
 
 void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* config) {
-    struct system_pinmux_config pinmux_config;
-    system_pinmux_get_config_defaults(&pinmux_config);
-    pinmux_config.mux_position = 0x1;
-    pinmux_config.input_pull = SYSTEM_PINMUX_PIN_PULL_NONE;
-    system_pinmux_pin_set_config(config->pin, &pinmux_config);
+
+    // Note: a precondition is that the pin in question must be set to mux position 1
+    // without pullups. In this library, that functionality is handled by the OO class.
 
     sync_config(module_inst);
     module_inst->CONTROLA.bit.ENABLE = 0;
