@@ -52,7 +52,7 @@ bool Adafruit_FreeTouch::begin(void) {
     */
     
     uint8_t channel = PTC_GCLK_ID;
-    uint8_t source_generator = 1;
+    uint8_t source_generator = 3;
     
     // original line: system_gclk_chan_set_config(PTC_GCLK_ID, &gclk_chan_conf);
     uint32_t new_clkctrl_config = (channel << GCLK_CLKCTRL_ID_Pos);  // from gclk.c
