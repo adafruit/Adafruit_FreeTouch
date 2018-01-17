@@ -29,11 +29,15 @@
 
 #include <stdint.h>
 
+
 #include "samd21_ptc_component.h"
+#include "samd11_ptc_component.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
 
 /* Touch library oversampling (filter) setting */
 typedef enum tag_oversample_level_t {
@@ -99,7 +103,7 @@ void adafruit_ptc_get_config_default(struct adafruit_ptc_config *config);
 void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* config);
 void adafruit_ptc_start_conversion(Ptc* module_inst, struct adafruit_ptc_config const* config);
 
-bool adafruit_ptc_is_conversion_finished(Ptc* module_inst);
+int adafruit_ptc_is_conversion_finished(Ptc* module_inst);
 uint16_t adafruit_ptc_get_conversion_result(Ptc* module_inst);
 
 #ifdef __cplusplus
