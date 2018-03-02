@@ -28,7 +28,7 @@
 #ifndef ADAFRUIT_FREETOUCH_PTC_COMPONENT_H
 #define ADAFRUIT_FREETOUCH_PTC_COMPONENT_H
 
-#include "compiler.h"
+#include <Arduino.h>
 
 #undef ENABLE
 
