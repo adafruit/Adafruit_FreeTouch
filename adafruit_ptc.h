@@ -27,6 +27,7 @@
 #ifndef ADAFRUIT_FREETOUCH_ADAFRUIT_PTC_H
 #define ADAFRUIT_FREETOUCH_ADAFRUIT_PTC_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "samd21_ptc_component.h"

@@ -24,10 +24,9 @@
  */
 
 #include "adafruit_ptc.h"
-#include "pinmux.h"
 
 static void sync_config(Ptc const* module_inst) {
-    while (module_inst->CONTROLB.bit.SYNCFLAG) ;
+    while (module_inst->CTRLB.bit.SYNCFLAG);
 }
 
 void adafruit_ptc_get_config_default(struct adafruit_ptc_config *config) {
@@ -41,27 +40,44 @@ void adafruit_ptc_get_config_default(struct adafruit_ptc_config *config) {
 }
 
 void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* config) {
-    struct system_pinmux_config pinmux_config;
-    system_pinmux_get_config_defaults(&pinmux_config);
-    pinmux_config.mux_position = 0x1;
-    pinmux_config.input_pull = SYSTEM_PINMUX_PIN_PULL_NONE;
-    system_pinmux_pin_set_config(config->pin, &pinmux_config);
+    // Configure the pin.
+    PortGroup* group = &PORT->Group[config->pin / 32];
+    uint8_t pin = config->pin % 32;
+    uint32_t pin_mask = (1UL << pin);
+    uint32_t wr_pin_mask;
+    uint32_t half_word_select;
+    if (pin > 15) {
+        wr_pin_mask = pin_mask >> 16;
+        half_word_select = PORT_WRCONFIG_HWSEL;
+    } else {
+        wr_pin_mask = pin_mask & 0xffff;
+        half_word_select = 0;
+    }
+    // Atomically change the pin config and the pin mux.
+    group->WRCONFIG.reg = wr_pin_mask |
+                          PORT_WRCONFIG_WRPINCFG |
+                          PORT_WRCONFIG_WRPMUX |
+                          PORT_WRCONFIG_PMUXEN |
+                          PORT_WRCONFIG_PMUX(1) |
+                          half_word_select;
+    // Make sure output is off.
+    group->DIRCLR.reg = pin_mask;
 
     sync_config(module_inst);
-    module_inst->CONTROLA.bit.ENABLE = 0;
+    module_inst->CTRLA.bit.ENABLE = 0;
     sync_config(module_inst);
 
     module_inst->UNK4C04.reg &= 0xF7; //MEMORY[0x42004C04] &= 0xF7u;
     module_inst->UNK4C04.reg &= 0xFB; //MEMORY[0x42004C04] &= 0xFBu;
     module_inst->UNK4C04.reg &= 0xFC; //MEMORY[0x42004C04] &= 0xFCu;
     sync_config(module_inst);
-    module_inst->FREQCONTROL.reg &= 0x9F;       //MEMORY[0x42004C0C] &= 0x9Fu;
+    module_inst->FREQCTRL.reg &= 0x9F;       //MEMORY[0x42004C0C] &= 0x9Fu;
     sync_config(module_inst);
-    module_inst->FREQCONTROL.reg &= 0xEF;       //MEMORY[0x42004C0C] &= 0xEFu;
+    module_inst->FREQCTRL.reg &= 0xEF;       //MEMORY[0x42004C0C] &= 0xEFu;
     sync_config(module_inst);
-    module_inst->FREQCONTROL.bit.SAMPLEDELAY = 0; //MEMORY[0x42004C0C] &= 0xF0u;
-    module_inst->CONTROLC.bit.INIT = 1;         //MEMORY[0x42004C05] |= 1u;
-    module_inst->CONTROLA.bit.RUNINSTANDBY = 1; //MEMORY[0x42004C00] |= 4u;
+    module_inst->FREQCTRL.bit.SAMPLEDELAY = 0; //MEMORY[0x42004C0C] &= 0xF0u;
+    module_inst->CTRLC.bit.INIT = 1;         //MEMORY[0x42004C05] |= 1u;
+    module_inst->CTRLA.bit.RUNINSTANDBY = 1; //MEMORY[0x42004C00] |= 4u;
     sync_config(module_inst);
     module_inst->INTDISABLE.bit.WCO = 1;
     sync_config(module_inst);
@@ -78,14 +94,14 @@ void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* confi
     }
 
     sync_config(module_inst);
-    module_inst->CONTROLA.bit.ENABLE = 1;
+    module_inst->CTRLA.bit.ENABLE = 1;
     sync_config(module_inst);
 }
 
 void adafruit_ptc_start_conversion(Ptc* module_inst, struct adafruit_ptc_config const* config) {
-    module_inst->CONTROLA.bit.RUNINSTANDBY = 1;
+    module_inst->CTRLA.bit.RUNINSTANDBY = 1;
     sync_config(module_inst);
-    module_inst->CONTROLA.bit.ENABLE = 1;
+    module_inst->CTRLA.bit.ENABLE = 1;
     sync_config(module_inst);
     module_inst->INTDISABLE.bit.WCO = 1;
     sync_config(module_inst);
@@ -113,15 +129,15 @@ void adafruit_ptc_start_conversion(Ptc* module_inst, struct adafruit_ptc_config 
     module_inst->SERRES.bit.RESISTOR = config->seriesres;
     sync_config(module_inst);
     // set up prescalar
-    module_inst->CONVCONTROL.bit.ADCACCUM = config->oversample;
+    module_inst->CONVCTRL.bit.ADCACCUM = config->oversample;
     sync_config(module_inst);
     // set up freq hopping
     if (config->freqhop == FREQ_MODE_NONE) {
-        module_inst->FREQCONTROL.bit.FREQSPREADEN = 0;
-        module_inst->FREQCONTROL.bit.SAMPLEDELAY = 0;
+        module_inst->FREQCTRL.bit.FREQSPREADEN = 0;
+        module_inst->FREQCTRL.bit.SAMPLEDELAY = 0;
     } else {
-        module_inst->FREQCONTROL.bit.FREQSPREADEN = 1;
-        module_inst->FREQCONTROL.bit.SAMPLEDELAY = config->hops;
+        module_inst->FREQCTRL.bit.FREQSPREADEN = 1;
+        module_inst->FREQCTRL.bit.SAMPLEDELAY = config->hops;
     }
     // set up compensation cap + int (?) cap
     sync_config(module_inst);
@@ -134,12 +150,12 @@ void adafruit_ptc_start_conversion(Ptc* module_inst, struct adafruit_ptc_config 
     module_inst->BURSTMODE.reg = 0xA4;
     sync_config(module_inst);
 
-    module_inst->CONVCONTROL.bit.CONVERT = 1;
+    module_inst->CONVCTRL.bit.CONVERT = 1;
     sync_config(module_inst);
 }
 
 bool adafruit_ptc_is_conversion_finished(Ptc* module_inst) {
-    return module_inst->CONVCONTROL.bit.CONVERT == 0;
+    return module_inst->CONVCTRL.bit.CONVERT == 0;
 }
 
 uint16_t adafruit_ptc_get_conversion_result(Ptc* module_inst) {
