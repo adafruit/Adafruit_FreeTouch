@@ -27,7 +27,7 @@
 
 #include "adafruit_ptc.h"
 
-#if !defined(__SAMD21G18A__) and !defined(__SAMD11C14A__)
+#if !defined(__SAMD__)
 #error "Adafruit FreeTouch does not work on your MCU - consider using QTouch"
 #endif
 
