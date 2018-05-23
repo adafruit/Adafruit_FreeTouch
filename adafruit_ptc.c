@@ -1,5 +1,5 @@
 /*
- * FreeTouch, a QTouch-compatible library - tested on ATSAMD21 only!
+ * FreeTouch, a QTouch-compatible library - tested on ATSAMD only!
  * The MIT License (MIT)
  *
  * Copyright (c) 2017 Limor 'ladyada' Fried for Adafruit Industries
