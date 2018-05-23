@@ -1,5 +1,5 @@
 /*
- * FreeTouch, a QTouch-compatible library - tested on ATSAMD21 only!
+ * FreeTouch, a QTouch-compatible library - tested on ATSAMD11 only!
  * The MIT License (MIT)
  *
  * Copyright (c) 2017 Limor 'ladyada' Fried for Adafruit Industries
@@ -29,7 +29,7 @@
 // instead of 0x42004Cxx
 
 // This is similar to the component definitions found in
-// sam0/utils/cmsis/samd21/include/component but for the PTC.
+// sam0/utils/cmsis/samd11/include/component but for the PTC.
 #ifndef ADAFRUIT_FREETOUCH_PTC_COMPONENT_SAMD11_H
 #define ADAFRUIT_FREETOUCH_PTC_COMPONENT_SAMD11_H
 
