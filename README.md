@@ -20,7 +20,7 @@ For more info, see https://www.arduino.cc/en/Guide/Libraries
 
 ### Original Library
 
-Based in the work of [Adafruit/Adafruit_FreeTouch](All documentation is in the Repository Wiki : (https://github.com/ElectronicCats/Adafruit_FreeTouch)
+Based in the work of [Adafruit/Adafruit_FreeTouch](https://github.com/ElectronicCats/Adafruit_FreeTouch)
 
 
 ### Maintainer
