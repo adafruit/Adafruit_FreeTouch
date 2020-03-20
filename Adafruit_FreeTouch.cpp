@@ -223,12 +223,24 @@ uint16_t Adafruit_FreeTouch::measureRaw(void) {
 int Adafruit_FreeTouch::getYLine(void) {
   int p = g_APinDescription[pin].ulPin;
   if (g_APinDescription[pin].ulPort == PORTA) {
-    if ((p >= 2) && (p <= 7)) {
+if(p==14){
+        return 6;
+    }
+    else if(p==15){
+        return  7;
+    }
+    else if(p==22){
+        return  12;
+    }
+    else if(p==23){
+        return  13;
+    }
+    else if ((p >= 2) && (p <= 7)) {
       return (p - 2);
     }
   }
   if (g_APinDescription[pin].ulPort == PORTB) {
-    if ((p >= 0) && (p <= 9)) {
+    if ((p >= 0) && (p <= 24)) {
       return (p + 6);
     }
   }
