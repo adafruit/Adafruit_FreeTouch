@@ -103,7 +103,7 @@ bool Adafruit_FreeTouch::begin(void) {
     PM->APBCMASK.reg |= PM_APBCMASK_PTC;
 #endif
 
-#ifdef __SAMD11C14A__
+#ifdef __SAMD11D14AS__
 // Sets up the clocks needed for the PTC module. The clock setup is described
 // in the touch.c implementation in the ASF examples I've replaced the ASF
 // calls with their low-level equivilents. Funny enough, the Generic Clock

@@ -35,7 +35,7 @@
 
 #include "sam.h"
 
-#ifdef __SAMD11C14A__
+#ifdef __SAMD11D14AS__
 
 #define     __O     volatile             /*!< Defines 'write only' permissions                */
 #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
