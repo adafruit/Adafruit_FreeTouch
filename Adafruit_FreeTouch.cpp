@@ -27,10 +27,10 @@
 
 #include "adafruit_ptc.h"
 
-#if !defined (ARDUINO_ARCH_SAMD)
+/*#if (!defined (ARDUINO_ARCH_SAMD)) || (!defined (ARDUINO_ARCH_SAMDLC))
 #error "Adafruit FreeTouch does not work on your MCU - consider using QTouch"
 #endif
-
+*/
 Adafruit_FreeTouch::Adafruit_FreeTouch(int p, oversample_t f, series_resistor_t r, freq_mode_t fh) {
     adafruit_ptc_get_config_default(&config);
     pin = p;
