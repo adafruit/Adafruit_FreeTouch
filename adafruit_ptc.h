@@ -38,73 +38,71 @@ extern "C" {
 
 /* Touch library oversampling (filter) setting */
 typedef enum tag_oversample_level_t {
-	OVERSAMPLE_1,
-	OVERSAMPLE_2,
-	OVERSAMPLE_4,
-	OVERSAMPLE_8,
-	OVERSAMPLE_16,
-	OVERSAMPLE_32,
-	OVERSAMPLE_64
-}
-oversample_t;
+  OVERSAMPLE_1,
+  OVERSAMPLE_2,
+  OVERSAMPLE_4,
+  OVERSAMPLE_8,
+  OVERSAMPLE_16,
+  OVERSAMPLE_32,
+  OVERSAMPLE_64
+} oversample_t;
 
 /* Touch library series resistor setting */
 typedef enum tag_series_resistor_t {
-	RESISTOR_0,
-	RESISTOR_20K,
-	RESISTOR_50K,
-	RESISTOR_100K,
-}
-series_resistor_t;
+  RESISTOR_0,
+  RESISTOR_20K,
+  RESISTOR_50K,
+  RESISTOR_100K,
+} series_resistor_t;
 
 typedef enum tag_freq_mode_t {
-	FREQ_MODE_NONE,
-	FREQ_MODE_HOP,
-	FREQ_MODE_SPREAD,
-	FREQ_MODE_SPREAD_MEDIAN
-}
-freq_mode_t;
+  FREQ_MODE_NONE,
+  FREQ_MODE_HOP,
+  FREQ_MODE_SPREAD,
+  FREQ_MODE_SPREAD_MEDIAN
+} freq_mode_t;
 
 typedef enum tag_freq_hop_t {
-	FREQ_HOP_1,
-	FREQ_HOP_2,
-	FREQ_HOP_3,
-	FREQ_HOP_4,
-	FREQ_HOP_5,
-	FREQ_HOP_6,
-	FREQ_HOP_7,
-	FREQ_HOP_8,
-	FREQ_HOP_9,
-	FREQ_HOP_10,
-	FREQ_HOP_11,
-	FREQ_HOP_12,
-	FREQ_HOP_13,
-	FREQ_HOP_14,
-	FREQ_HOP_15,
-	FREQ_HOP_16
-}
-freq_hop_t;
+  FREQ_HOP_1,
+  FREQ_HOP_2,
+  FREQ_HOP_3,
+  FREQ_HOP_4,
+  FREQ_HOP_5,
+  FREQ_HOP_6,
+  FREQ_HOP_7,
+  FREQ_HOP_8,
+  FREQ_HOP_9,
+  FREQ_HOP_10,
+  FREQ_HOP_11,
+  FREQ_HOP_12,
+  FREQ_HOP_13,
+  FREQ_HOP_14,
+  FREQ_HOP_15,
+  FREQ_HOP_16
+} freq_hop_t;
 
 struct adafruit_ptc_config {
-    uint8_t pin;           // ASF pin #
-    int8_t yline;      // the Y select line (see datasheet)
-    oversample_t oversample;
-    series_resistor_t seriesres;
-    freq_mode_t freqhop;
-    freq_hop_t hops;
-    uint16_t compcap;
-    uint8_t  intcap;
+  uint8_t pin;  // ASF pin #
+  int8_t yline; // the Y select line (see datasheet)
+  oversample_t oversample;
+  series_resistor_t seriesres;
+  freq_mode_t freqhop;
+  freq_hop_t hops;
+  uint16_t compcap;
+  uint8_t intcap;
 };
 
 void adafruit_ptc_get_config_default(struct adafruit_ptc_config *config);
-void adafruit_ptc_init(Ptc* module_inst, struct adafruit_ptc_config const* config);
-void adafruit_ptc_start_conversion(Ptc* module_inst, struct adafruit_ptc_config const* config);
+void adafruit_ptc_init(Ptc *module_inst,
+                       struct adafruit_ptc_config const *config);
+void adafruit_ptc_start_conversion(Ptc *module_inst,
+                                   struct adafruit_ptc_config const *config);
 
-bool adafruit_ptc_is_conversion_finished(Ptc* module_inst);
-uint16_t adafruit_ptc_get_conversion_result(Ptc* module_inst);
+bool adafruit_ptc_is_conversion_finished(Ptc *module_inst);
+uint16_t adafruit_ptc_get_conversion_result(Ptc *module_inst);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // ADAFRUIT_FREETOUCH_ADAFRUIT_PTC_H
+#endif // ADAFRUIT_FREETOUCH_ADAFRUIT_PTC_H
