@@ -1,7 +1,4 @@
 
-<a href="https://electroniccats.com/store/">
-  <img src="https://electroniccats.com/wp-content/uploads/badge_store.png" height="104" />
-</a>
 <a href="https://electroniccats.com/blog/apoya-el-hardware-libre-con-github-sponsors/">
   <img src="https://electroniccats.com/wp-content/uploads/2020/07/Badge_GHS.png" height="104" />
 </a>
