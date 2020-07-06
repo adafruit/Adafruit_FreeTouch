@@ -1,5 +1,5 @@
 
-<a href="https://electroniccats.com/blog/apoya-el-hardware-libre-con-github-sponsors/">
+<a href="https://electroniccats.com/badge_ghs/">
   <img src="https://electroniccats.com/wp-content/uploads/2020/07/Badge_GHS.png" height="104" />
 </a>
 
