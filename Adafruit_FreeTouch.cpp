@@ -185,11 +185,9 @@ void Adafruit_FreeTouch::snapshotRegsAndPrint(uint32_t base, uint8_t numregs) {
   volatile uint32_t addr = base;
   uint8_t datas[255];
 
-  digitalWrite(LED_BUILTIN, HIGH);
   for (uint8_t i = 0; i < numregs; i++) {
     datas[i] = *(uint8_t *)(addr + i);
   }
-  digitalWrite(LED_BUILTIN, LOW);
   printPTCregs(base, datas, numregs);
 
   for (uint8_t i = 0; i < numregs; i++) {
